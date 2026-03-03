@@ -1,0 +1,35 @@
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Prestação de Conta e Contrapartida</title>
+    <link rel="icon" href="https://ceia.ufg.br/favicon.ico" type="image/x-icon" />
+
+</head>
+
+<body class="d-flex align-items-center justify-content-center vh-100 bg-light">
+<br>
+    <form method="POST" action="{% url 'index' %}" class="p-4 border rounded shadow bg-white text-center" style="max-width: 350px; width: 100%;">
+        {% csrf_token %}
+        <h4 class="mb-4 text-primary">Prestação de Conta e Contrapartida</h4>
+
+        <div class="mb-3">
+            <input type="text" name="username" class="form-control" placeholder="Usuário" required>
+        </div>
+        <div class="mb-3">
+            <input type="password" name="password" class="form-control" placeholder="Senha" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Acessar</button>
+    </form>
+
+</body>
+
+</html>

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+{% block titulo %}Import CSV{% endblock %}
+{% block corpo %}
+<center>
+    <br>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="model_choice">Escolha o modelo para importar:</label>
+        <select name="model_choice" id="model_choice">
+            <option value="pessoa">Pessoa</option>
+            <option value="projeto">Projeto</option>
+            <option value="equipamento">Equipamento</option>
+            <option value="salario">Salário</option>
+        </select>
+
+        <input type="file" name="csv_file" />
+        <button type="submit">Importar CSV</button>
+    </form>
+    <br>
+    <a href="{% url 'download_database' %}" class="btn btn-success">
+        Download Banco de Dados
+    </a>
+</center>
+{% endblock %}

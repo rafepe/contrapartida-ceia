@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Contrapartida SO</title>
+</head>
+
+{% block corpo %}
+<body>
+    <div class="container">
+        <div class="text-center">
+            {% if form.instance.pk %}
+                 <h1>Atualizar Contrapartida SO</h1>
+            {% else %}
+                 <h1>Cadastrar Contrapartida SO</h1>
+            {% endif %}
+
+            <h2>{{projeto.nome}}</h2>
+             <br>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+
+                <div class="row justify-content-center" style="line-height: 1;">
+
+                    <div class="col-md-4 col-sm-6">
+                        {% bootstrap_field form.ano placeholder='' %}
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        {% bootstrap_field form.mes placeholder='' %}
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        {% bootstrap_field form.valor placeholder='' %}
+                    </div>
+
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-auto">
+
+                        <button type="submit" class="btn btn-primary mt-3">Salvar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}

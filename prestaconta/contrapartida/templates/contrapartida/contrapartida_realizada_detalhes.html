@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block corpo %}
+<div class="text-center">
+<h2>Detalhes do Projeto: {{ projeto.nome }}</h2>
+
+<table border="1" cellpadding="10" cellspacing="2" style="width: 100%; text-align: center;">
+    <thead>
+        <tr>
+            <th>Projeto</th>
+            <th>Valor Total Contrapartida</th>
+            <th>Número de Meses</th>
+            <th>Valor Mensal Devido</th>
+            <th>Data de Início</th>
+            <th>Data de Fim</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ projeto.nome }}</td>
+            <td>R$ {{ projeto.contrapartida_max|floatformat:2 }}</td>
+            <td>{{ projeto.num_mes }}</td>
+            <td>R$ {{ mensal_devido|floatformat:2 }}</td>
+            <td>{{ projeto.data_inicio|date:"d/m/Y" }}</td>
+            <td>{{ projeto.data_fim|date:"d/m/Y" }}</td>
+        </tr>
+    </tbody>
+</table>
+<div class="text-center my-3">
+  <button id="toggleViewBtn" class="btn btn-outline-primary">Alterar Visualização</button>
+</div>
+<div id="tabela-normal">
+<h3>Contrapartidas por Mês</h3>
+
+<table border="1" cellpadding="10" cellspacing="2" style="width: 100%; text-align: center;">
+    <thead>
+        <tr>
+            <th>Mês</th>
+            <th>Equipamento</th>
+            <th>Pesquisa</th>
+            <th>Rh</th>
+            <th>SO</th>
+            <th>Total</th>
+            <th>Diferença</th>
+            <th>Saldo</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for mes, valores in contrapartidas_por_mes.items %}
+        <tr>
+            <td>{{ mes }}</td>
+            <td>R$ {{ valores.equipamento|floatformat:2 }}</td>
+            <td>R$ {{ valores.pesquisa|floatformat:2 }}</td>
+            <td>R$ {{ valores.rh|floatformat:2 }}</td>
+            <td>R$ {{ valores.so|floatformat:2 }}</td>
+            <td>R$ {{ valores.total|floatformat:2 }}</td>
+            <td>R$ {{ valores.diferenca|floatformat:2 }}</td>
+            <td>R$ {{ valores.saldo|floatformat:2}}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">Nenhuma contrapartida encontrada.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+<div id="tabela-pivotada" style="display: none;">    
+<h3>Contrapartidas por Mês Horizontal</h3>
+
+<div style="overflow-x: auto; max-width: 100%;">
+  <div style="min-width: 100%; max-width: 100%; overflow-x: auto;">
+    <table border="1" cellpadding="10" cellspacing="0"
+           style="min-width: calc(7 * 150px); width: max-content; border-collapse: collapse; text-align: center;">
+      <thead>
+        <tr>
+          <th style="position: sticky; left: 0; background-color: #f9f9f9; z-index: 2;">Tipo</th>
+          {% for data in ano_mes %}
+            <th style="min-width: 150px;">{{ data }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for linha in dados_tabela %}
+          {% if linha.tipo == "Total" %}
+            <tr style="border-top: 3px solid #ccc;">
+          {% else %}
+            <tr>
+          {% endif %}
+            <td style="position: sticky; left: 0; background-color: #f9f9f9; font-weight: bold; z-index: 1;">{{ linha.tipo }}</td>
+            {% for valor in linha.valores %}
+              {% if linha.tipo == "Saldo" %}
+                <td style="font-weight: bold; background-color: {% if valor < 0 %}#f8d7da{% else %}#d4edda{% endif %}; color: {% if valor < 0 %}#721c24{% else %}#155724{% endif %}; min-width: 150px;">
+                  {{ valor|floatformat:2 }}
+                </td>
+              {% else %}
+                <td style="min-width: 100px;">{{ valor|floatformat:2 }}</td>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>  
+</div>
+
+</div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      const btn = document.getElementById('toggleViewBtn');
+      const normal = document.getElementById('tabela-normal');
+      const pivotada = document.getElementById('tabela-pivotada');
+  
+      btn.addEventListener('click', function () {
+          if (normal.style.display === 'none') {
+              normal.style.display = 'block';
+              pivotada.style.display = 'none';
+              btn.textContent = 'Alterar Visualização';
+          } else {
+              normal.style.display = 'none';
+              pivotada.style.display = 'block';
+              btn.textContent = 'Alterar Visualização';
+          }
+      });
+  });
+  </script>
+{% endblock %}

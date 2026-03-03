@@ -1,0 +1,38 @@
+/venv/
+/venv_windows/
+prestaconta/contrapartida/__init__.py
+prestaconta/contrapartida/admin.py
+prestaconta/contrapartida/apps.py
+prestaconta/contrapartida/migrations/
+prestaconta/contrapartida/tests.py
+prestaconta/nohup.out
+prestaconta/static/db.sqlite3
+/ignore/
+prestaconta/db.sqlite3
+*.sqlite3
+
+# Ignore arquivos de cache do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore arquivos temporários e de log
+*.log
+*.tmp
+*.swp
+
+# Ignore configurações e credenciais locais (se houver)
+.env
+*.local
+
+# Ignore arquivos gerados pelo sistema operacional
+.DS_Store
+Thumbs.db
+
+# Ignore arquivos estáticos gerados
+media/
+
+# Ignore migrações compiladas
+contrapartida/migrations/__pycache__/
+prestaconta/__pycache__/

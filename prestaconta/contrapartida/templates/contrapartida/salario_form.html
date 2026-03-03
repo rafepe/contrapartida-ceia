@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+<!doctype html>
+<html>
+
+<head>
+    <title>Cadastro de Salário</title>
+</head>
+{% block corpo %}
+
+<body>
+    <div class="container">
+        <div class="text-center">
+
+            {% if salario.id %}
+            <h1>Atualizar Salário</h1>
+            {% else %}
+            <h1>Cadastrar Salário</h1>
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="row justify-content-center" style="line-height: 1;">
+                    <div class="col-md-4 col-sm-2">
+                        {% bootstrap_field form.id_pessoa placeholder='' %}
+                    </div> 
+                    <div class="col-md-2 col-sm-2">
+                        {% bootstrap_field form.ano placeholder='' %}
+                    </div>
+                    <div class="col-md-2 col-sm-2">
+                        {% bootstrap_field form.mes placeholder='' %}
+                    </div>          
+                </div>
+                
+                <div class="row justify-content-center" style="line-height: 1;">
+                    <div class="col-md-4 col-sm-4 col-xs-12">
+                        {% bootstrap_field form.valor placeholder='' %}
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-12">
+                        {% bootstrap_field form.horas placeholder='' %}
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-12">
+                        {% bootstrap_field form.horas_limite placeholder='' %}
+                    </div>
+                </div>
+
+                <div class="row justify-content-center" style="line-height: 1;">
+                    <div class="col-md-8 col-sm-8 col-xs-12">
+                        {% bootstrap_field form.anexo %}
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary mt-3">Salvar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
+{% endblock %}

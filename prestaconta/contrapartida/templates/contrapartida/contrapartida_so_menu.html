@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+{% load django_tables2 %}
+{% render_table table %}
+
+
+{% block titulo %}Contrapartida SO{% endblock %}
+{% block corpo %}
+
+
+<center>
+    {% include "blocos/filtro_padrao.html" with mostrar_peia=True mostrar_projeto=True  mostrar_ano_fim=True mostrar_mes_fim=True %}
+</center>
+
+<body>
+    <div class="container">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <center>
+                <h1>Contrapartida SO</h1>
+                <!-- Tabela -->
+                {% load render_table from django_tables2 %}
+
+                {% render_table table %}
+                <br>
+                <td>
+                    <a href="{% url 'contrapartida_so_criar_multiplos' %}">
+                            <input type="button" class="btn btn-primary" value="Incluir multiplos">
+                    </a>
+                </td>    
+        
+            </center>
+
+
+        </div>
+    </div>            
+</body>
+
+</html>
+{% endblock %}
