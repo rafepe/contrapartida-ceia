@@ -12,9 +12,14 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# separating envs for dev & prd
+ENVIRONMENT = os.getenv("ENVIRONMENT", "dev")
+load_dotenv(f".{ENVIRONMENT}.env")
 
 
 # Quick-start development settings - unsuitable for production
@@ -40,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'contrapartida',
     'declaracao',
+    'assinatura',
     'django_tables2',
     'bootstrap5',
     'django_extensions',
@@ -150,3 +156,23 @@ EMAIL_USE_TLS = True
 #EMAIL_OAUTH2_CLIENT_ID = os.getenv('EMAIL_OAUTH2_CLIENT_ID', 'your_client_id')
 #EMAIL_OAUTH2_CLIENT_SECRET = os.getenv('EMAIL_OAUTH2_CLIENT_SECRET', 'your_client_secret')
 #EMAIL_OAUTH2_REFRESH_TOKEN = os.getenv('EMAIL_OAUTH2_REFRESH_TOKEN', 'your_refresh_token')
+
+
+def get_env(name):
+    value = os.getenv(name)
+    if not value:
+        raise Exception(f"Missing env var: {name}")
+    return value
+
+
+ZAPSIGN = {
+    "BASE_URL": get_env("ZAPSIGN_BASE_URL"),
+    "API_TOKEN": get_env("ZAPSIGN_API_TOKEN"),
+    "WEBHOOK_SECRET": get_env("ZAPSIGN_WEBHOOK_SECRET"),
+}
+
+# ZAPSIGN = {
+#     "BASE_URL": os.getenv("ZAPSIGN_BASE_URL"),
+#     "API_TOKEN": os.getenv("ZAPSIGN_API_TOKEN"),
+#     "WEBHOOK_SECRET": os.getenv("ZAPSIGN_WEBHOOK_SECRET"),
+# }
