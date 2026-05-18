@@ -358,13 +358,11 @@ def redirect_to_central(projeto_id, ano, semestre, projeto_nome=None, mes=None):
     """
     Função auxiliar para redirecionamento para a central
     """
-    url = reverse('central_declaracoes')
-    params = f'?projeto_id={projeto_id}&ano={ano}&semestre={semestre}'
+    url = reverse('/declaracao/menu/')
+    params = f'?&ano={ano}&semestre={semestre}'
 
-    if projeto_nome:
-        params += f'&projeto={projeto_nome}'
-    if mes:
-        params += f'&mes={mes}'
+    if projeto_id:
+        params += f'&projeto_id={projeto_id}'
 
     return redirect(f'{url}{params}')
 

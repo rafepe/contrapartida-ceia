@@ -21,6 +21,7 @@ from .models import (
     declaracao_contrapartida_so,
     declaracao_contrapartida_equipamento,
     declaracao_contrapartida_equipamento_item,
+    declaracao_documento
 )
 from contrapartida.models import equipamento
 
@@ -127,6 +128,12 @@ def _nome_arquivo_declaracao(ano: int, semestre: int, codigo_peia: str, nome: st
     slug = _slugify_nome(codigo_peia, nome)
     return f"{slug}-{tipo}-{ano}-{mes:02d}.docx"
 
+def _nome_arquivo_declaracao_equipamento(ano: int, mes:int)->str:
+    """
+    Declaração de equipamento é única por mês:
+    equipamentos-AAAA-MM.docx
+    """
+    return f"equipamentos-{ano}-{mes:02d}.docx"
 
 def _caminho_docx_declaracao(ano: int, semestre: int, codigo_peia: str, nome: str,
                              tipo: str, mes: int) -> str:
@@ -141,7 +148,7 @@ def _caminho_docx_equipamento(ano: int, semestre: int, mes: int) -> str:
     equipamentos-AAAA-MM.docx
     """
     pasta = _pasta_declaracoes_semestre(ano, semestre)
-    filename = f"equipamentos-{ano}-{mes:02d}.docx"
+    filename =_nome_arquivo_declaracao_equipamento(ano,mes)
     return os.path.join(pasta, filename)
 
 
@@ -241,7 +248,21 @@ def gerar_docx_rh(declaracao) -> str:
 
     semestre = 1 if mes <= 6 else 2
     caminho_saida = _caminho_docx_declaracao(ano, semestre, codigo_peia, projeto_nome, "rh", mes)
+    nome_arquivo=_nome_arquivo_declaracao(ano, semestre, codigo_peia, projeto_nome, "rh", mes)
     doc.save(caminho_saida)
+
+    declaracao_documento.objects.create(
+    ano=ano,
+    semestre=semestre,
+    mes=mes,
+    codigo_peia=codigo_peia,
+    nome_projeto=projeto_nome,
+    id_projeto=declaracao.id_projeto,
+    id_declaracao=declaracao.id,
+    tipo='rh',
+    caminho_arquivo=caminho_saida,
+    nome_arquivo=nome_arquivo,
+)
     return caminho_saida
 
 
@@ -291,6 +312,22 @@ def gerar_docx_so(declaracao) -> str:
     semestre = 1 if mes <= 6 else 2
     caminho_saida = _caminho_docx_declaracao(ano, semestre, codigo_peia, projeto_nome, "so", mes)
     doc.save(caminho_saida)
+    
+    nome_arquivo=_nome_arquivo_declaracao(ano, semestre, codigo_peia, projeto_nome, "so", mes)
+    declaracao_documento.objects.create(
+    ano=ano,
+    semestre=semestre,
+    mes=mes,
+    codigo_peia=codigo_peia,
+    nome_projeto=projeto_nome,
+    id_projeto=declaracao.id_projeto,
+    id_declaracao=declaracao.id,
+    tipo='so',
+    caminho_arquivo=caminho_saida,
+    nome_arquivo=nome_arquivo,
+)
+
+
     return caminho_saida
 
 
@@ -403,6 +440,22 @@ def gerar_docx_pesquisa(declaracao) -> str:
     semestre = 1 if mes <= 6 else 2
     caminho_saida = _caminho_docx_declaracao(ano, semestre, codigo_peia, projeto_nome, "pesquisa", mes)
     doc.save(caminho_saida)
+
+    nome_arquivo=_nome_arquivo_declaracao(ano, semestre, codigo_peia, projeto_nome, "pesquisa", mes)
+    declaracao_documento.objects.create(
+    ano=ano,
+    semestre=semestre,
+    mes=mes,
+    codigo_peia=codigo_peia,
+    nome_projeto=projeto_nome,
+    id_projeto=declaracao.id_projeto,
+    id_declaracao=declaracao.id,
+    tipo='pesquisa',
+    caminho_arquivo=caminho_saida,
+    nome_arquivo=nome_arquivo,
+)
+
+
     return caminho_saida
 
 
@@ -529,4 +582,20 @@ def gerar_docx_equipamento(declaracao) -> str:
     semestre = 1 if declaracao.mes <= 6 else 2
     caminho_saida = _caminho_docx_equipamento(declaracao.ano, semestre, declaracao.mes)
     doc.save(caminho_saida)
+
+    nome_arquivo=_nome_arquivo_declaracao_equipamento(declaracao.ano, declaracao.mes)
+    declaracao_documento.objects.create(
+    ano=declaracao.ano,
+    semestre=semestre,
+    mes=declaracao.mes,
+    #codigo_peia=codigo_peia,
+    #nome_projeto=projeto_nome,
+    #id_projeto=declaracao.id_projeto,
+    #id_declaracao=declaracao.id_projeto
+    tipo='equipamento',
+    caminho_arquivo=caminho_saida,
+    nome_arquivo=nome_arquivo,
+)
+
+
     return caminho_saida

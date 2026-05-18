@@ -65,8 +65,9 @@ def gerar_docx_rh(request, declaracao_id):
     decl = get_object_or_404(declaracao_contrapartida_rh, id=declaracao_id)
     _gerar_docx_rh(decl)
     messages.success(request, "DOCX RH gerado.")
+    semestre=1 if decl.mes <=6 else 2
     url = reverse('declaracoes_menu')
-    return redirect(f'{url}?projeto={decl.projeto}&mes={decl.mes}&ano={decl.ano}')
+    return redirect(f'{url}?&ano={decl.ano}&semestre={semestre}&projeto_id={decl.id_projeto}')
 
 
 @login_required
@@ -74,8 +75,9 @@ def gerar_docx_pesquisa(request, declaracao_id):
     decl = get_object_or_404(declaracao_contrapartida_pesquisa, id=declaracao_id)
     _gerar_docx_pesquisa(decl)
     messages.success(request, "DOCX Pesquisa gerado.")
+    semestre=1 if decl.mes <=6 else 2
     url = reverse('declaracoes_menu')
-    return redirect(f'{url}?projeto={decl.projeto}&mes={decl.mes}&ano={decl.ano}')
+    return redirect(f'{url}?&ano={decl.ano}&semestre={semestre}&projeto_id={decl.id_projeto}')
 
 
 @login_required
@@ -83,8 +85,9 @@ def gerar_docx_so(request, declaracao_id):
     decl = get_object_or_404(declaracao_contrapartida_so, id=declaracao_id)
     _gerar_docx_so(decl)
     messages.success(request, "DOCX SO gerado.")
+    semestre=1 if decl.mes <=6 else 2
     url = reverse('declaracoes_menu')
-    return redirect(f'{url}?projeto={decl.projeto}&mes={decl.mes}&ano={decl.ano}')
+    return redirect(f'{url}?&ano={decl.ano}&semestre={semestre}&projeto_id={decl.id_projeto}')
 
 
 @login_required
@@ -92,8 +95,9 @@ def gerar_docx_equipamento(request, id):
     decl = get_object_or_404(declaracao_contrapartida_equipamento, id=id)
     _gerar_docx_equipamento(decl)
     messages.success(request, "DOCX Equipamento gerado.")
+    semestre=1 if decl.mes <=6 else 2
     url = reverse('declaracoes_menu')
-    return redirect(f'{url}?mes={decl.mes}&ano={decl.ano}')
+    return redirect(f'{url}?&ano={decl.ano}&semestre={semestre}')
 
 
 def gerar_declaracoes_semestre(request):

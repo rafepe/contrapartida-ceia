@@ -6,7 +6,6 @@
 <div class="container mt-4">
     <h2>Central de Declarações</h2>
     <hr>
-    
     <!-- Navegação entre semestres -->
     <div class="d-flex align-items-center justify-content-between mb-4">
         <div class="d-flex align-items-center">
@@ -19,6 +18,11 @@
                     <input type="hidden" name="ano" value="{{ ano }}">
                     <input type="hidden" name="semestre" value="1">
                 {% endif %}
+            
+                {% if projeto_id %}
+                    <input type="hidden" name="projeto_id" value="{{ projeto_id }}">
+                {% endif %}
+            
                 <button type="submit" class="btn btn-outline-secondary">
                     <i class="fas fa-chevron-left"></i> Anterior
                 </button>
@@ -33,18 +37,25 @@
             </div>
             
             <!-- Botão Semestre Seguinte -->
-            <form method="get" class="ms-2">
+            <form method="get" class="me-2">
                 {% if semestre == 2 %}
                     <input type="hidden" name="ano" value="{{ ano|add:"1" }}">
-                    <input type="hidden" name="semestre" value="1">
+                    <input type="hidden" name="semestre" value="2">
                 {% else %}
                     <input type="hidden" name="ano" value="{{ ano }}">
                     <input type="hidden" name="semestre" value="2">
                 {% endif %}
+            
+                {% if projeto_id %}
+                    <input type="hidden" name="projeto_id" value="{{ projeto_id }}">
+                {% endif %}
+            
                 <button type="submit" class="btn btn-outline-secondary">
                     Próximo <i class="fas fa-chevron-right"></i>
                 </button>
-            </form>
+            </form> 
+
+
         </div>
         
         <!-- Botão de atualizar -->
@@ -64,10 +75,11 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-10">
-                    <select id="projeto_select" class="form-select" onchange="carregarDadosProjeto()">
+                    <select id="projeto_select" class="form-select" onchange="carregarDadosProjeto(false)">
                         <option value="">-- Selecione um projeto --</option>
                         {% for p in projetos %}
-                            <option value="{{ p.id }}" 
+                            <option value="{{ p.id }}"
+                                    {% if projeto_id == p.id|stringformat:"s" %}selected{% endif %}
                                     data-nome="{{ p.nome }}" 
                                     data-inicio="{{ p.data_inicio|date:'m/Y' }}" 
                                     data-fim="{{ p.data_fim|date:'m/Y' }}"
@@ -135,86 +147,13 @@
             </div>
         </div>
     </div>
-    
-    {% if projeto %}
-    <br>
-    <form method="GET" class="row g-3">
-        <input type="hidden" name="projeto" value="{{ projeto.nome }}">
-        <div class="col-md-2">
-            <label for="mes" class="form-label">Mês</label>
-            <input type="number" class="form-control" id="mes" name="mes" min="1" max="12" value="{{ mes }}" required>
-        </div>
-        <div class="col-md-2">
-            <label for="ano" class="form-label">Ano</label>
-            <input type="number" class="form-control" id="ano" name="ano" min="2000" max="2100" value="{{ ano }}" required>
-        </div>
-        <div class="col-md-2 d-flex align-items-end">
-            <button type="submit" class="btn btn-success w-100">Filtrar/Ajustar</button>
-        </div>
-    </form>
-    <hr>
-    <h4>Projeto: {{ projeto.nome }} | {{ mes }}/{{ ano }}</h4>
-    <table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                <th>Contrapartida</th>
-                <th>Gerar</th>
-                <th>Visualizar</th>
-                <th>Excluir</th>
-                <th>DOCX</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for tipo,res in declaracoes.items %}
-            <tr>
-                <td>{{ tipo|title }}</td>
-                <td>
-                    <a href="{% url 'gerar_declaracao_contrapartida_'|add:tipo projeto.id mes ano %}" class="btn btn-sm btn-primary">
-                      Gerar
-                    </a>
-                </td>
-                <td>
-                    {% if declaracoes|dictkey:tipo %}
-                        <a href="{% url 'ver_declaracao_contrapartida_'|add:tipo res.id %}" class="btn btn-sm btn-info">
-                            Ver
-                        </a>
-                    {% else %}
-                        <button class="btn btn-sm btn-secondary" disabled>Não existe</button>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if declaracoes|dictkey:tipo %}
-                        <a href="{% url 'remover_declaracao_contrapartida_'|add:tipo res.pk %}" class="btn btn-danger btn-sm">
-                            Excluir
-                        </a>
-                    {% else %}
-                        <button class="btn btn-sm btn-secondary" disabled>Excluir</button>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if declaracoes|dictkey:tipo %}
-                       <p>docx</p>
-                    {% else %}
-                        <button class="btn btn-sm btn-secondary" disabled>Não existe</button>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
-    
-    {% else %}
-        <div class="alert alert-warning">
-            <i class="fas fa-exclamation-triangle"></i>
-            Nenhum projeto ativo neste semestre.
-        </div>
     {% endif %}
 </div>
 
 <script>
-window.SEMESTRE_CONTEXT = {{ semestre }};
-window.ANO_CONTEXT = {{ ano }};
+let isInit = true;
+window.SEMESTRE_CONTEXT = Number("{{ semestre }}");
+window.ANO_CONTEXT = Number("{{ ano }}");
 // Dados dos meses por semestre
 const mesesSemestre = {
     1: [
@@ -235,32 +174,47 @@ const mesesSemestre = {
     ]
 };
 
-function carregarDadosProjeto() {
+function carregarDadosProjeto(fromInit = false) {
     const select = document.getElementById('projeto_select');
-    console.log('entrou carregarDadosProjeto')
-    const selectedOption = select.options[select.selectedIndex];
-    
-    if (!selectedOption.value) {
+    const projetoId = select.value;
+
+    if (!projetoId) {
         document.getElementById('dados_projeto').style.display = 'none';
         return;
     }
+
+    const selectedOption = select.options[select.selectedIndex];
+
+    if (!selectedOption) return;
     
-    // Mostrar dados do projeto
+    const ano = window.ANO_CONTEXT;
+    const semestre = window.SEMESTRE_CONTEXT;
+
+    // só muda URL se NÃO for init
+    if (!fromInit) {
+        const novaUrl = new URL(window.location.href);
+
+        novaUrl.searchParams.set("ano", ano);
+        novaUrl.searchParams.set("semestre", semestre);
+        novaUrl.searchParams.set("projeto_id", projetoId);
+
+        window.location.href = novaUrl.toString();
+        return;
+    }
+
     document.getElementById('projeto_nome').textContent = selectedOption.dataset.nome;
     document.getElementById('projeto_detalhes').textContent = `Código: ${selectedOption.dataset.peia}`;
-    document.getElementById('projeto_periodo').textContent = `${selectedOption.dataset.inicio} - ${selectedOption.dataset.fim}`;
-    
-    // Mostrar loading
+    document.getElementById('projeto_periodo').textContent =
+        `${selectedOption.dataset.inicio} - ${selectedOption.dataset.fim}`;
+
     document.getElementById('dados_projeto').style.display = 'block';
     document.getElementById('loading_dados').style.display = 'block';
     document.getElementById('tabela_meses').style.display = 'none';
     document.getElementById('sem_dados').style.display = 'none';
-    console.log('entrou loading')
-    // Simular carregamento (substitua por chamada AJAX real)
-    setTimeout(() => {
-        carregarDadosMeses(selectedOption.value);
-    }, 1000);
+
+    carregarDadosMeses(projetoId);
 }
+
 
 function carregarDadosMeses(projetoId) {
     // Remover duplicidade: as variáveis semestre e ano já estão disponíveis no escopo do template
@@ -335,7 +289,7 @@ function preencherTabelaMesesBasica(meses, projetoId, ano) {
 
 function gerarColunaDeclaracao(dados, tipo, projetoId, mes, ano) {
     const temDeclaracao = dados && dados[tipo] && dados[tipo].existe;
-    console.log('DEBUG gerarColunaDeclaracao', {dados, tipo, dadosTipo: dados ? dados[tipo] : undefined, temDeclaracao});
+    //console.log('DEBUG gerarColunaDeclaracao', {dados, tipo, dadosTipo: dados ? dados[tipo] : undefined, temDeclaracao});
     const podeGerar = dados && dados[tipo] && dados[tipo].pode_gerar;
     
     if (temDeclaracao) {
@@ -396,13 +350,23 @@ return `
     </div>
 `;
 
-    }
-}
+    }}
 
+document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const projetoId = urlParams.get("projeto_id");
 
+    if (!projetoId) return;
 
+    const select = document.getElementById("projeto_select");
 
+    if (!select) return;
 
+    select.value = projetoId;
+
+    
+    carregarDadosProjeto(true);
+});
 
 </script>
 

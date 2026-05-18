@@ -44,7 +44,8 @@ def gerar_declaracao_contrapartida_pesquisa(request, projeto_id, mes, ano):
     if declaracao_existente:
         messages.info(request, f"Já existe uma declaração para {projeto_selecionado.nome} - {mes}/{ano}.")
         url = reverse('declaracoes_menu')
-        return redirect(f'{url}?projeto={projeto_selecionado.nome}&mes={mes}&ano={ano}')
+        semestre = 1 if mes <= 6 else 2
+        return redirect(f"/declaracao/menu/?ano={ano}&semestre={semestre}&projeto_id={projeto_selecionado.id}")
 
     declaracao = declaracao_contrapartida_pesquisa.objects.create(
         id_projeto=projeto_id,
@@ -64,7 +65,8 @@ def gerar_declaracao_contrapartida_pesquisa(request, projeto_id, mes, ano):
         messages.warning(request, "Nenhum dado encontrado para gerar a declaração.")
         declaracao.delete()
         url = reverse('declaracoes_menu')
-        return redirect(f'{url}?projeto={projeto_selecionado.nome}&mes={mes}&ano={ano}')
+        semestre = 1 if mes <= 6 else 2
+        return redirect(f"/declaracao/menu/?ano={ano}&semestre={semestre}&projeto_id={projeto_selecionado.id}")
 
     total = 0
 
@@ -86,7 +88,8 @@ def gerar_declaracao_contrapartida_pesquisa(request, projeto_id, mes, ano):
 
     messages.success(request, f"Declaração gerada para {projeto_selecionado.nome} - {mes}/{ano}.")
     url = reverse('declaracoes_menu')
-    return redirect(f'{url}?projeto={projeto_selecionado.nome}&mes={mes}&ano={ano}')
+    semestre = 1 if mes <= 6 else 2
+    return redirect(f"/declaracao/menu/?ano={ano}&semestre={semestre}&projeto_id={projeto_selecionado.id}")
 
 
 class declaracao_contrapartida_pesquisa_view(TemplateView):
@@ -121,11 +124,9 @@ class declaracao_contrapartida_pesquisa_delete(DeleteView):
     fields = []
     template_name_suffix = '_delete'
     context_object_name = 'declaracao'
-    success_url = '/declaracao/menu/?projeto={projeto}&mes={mes}&ano={ano}'
 
     def get_success_url(self):
-        return self.success_url.format(
-            projeto=self.object.projeto,
-            mes=self.object.mes,
-            ano=self.object.ano
-        )
+        obj = self.object
+        semestre = 1 if obj.mes <= 6 else 2
+        return f"/declaracao/menu/?ano={obj.ano}&semestre={semestre}&projeto_id={obj.id_projeto}"
+

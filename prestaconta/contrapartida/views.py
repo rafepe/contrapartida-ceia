@@ -6,6 +6,7 @@ from django_tables2 import SingleTableView,RequestConfig
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.db import IntegrityError, transaction
 from django.db.models import Q, Sum
@@ -24,6 +25,10 @@ import os
 import re
 from .forms import ContrapartidaPesquisaFormSet,ContrapartidaRhFormSet,ContrapartidaSOFormSet,ContrapartidaEquipamentoFormSet
 import zipfile
+
+
+
+
 
 def index(request):
     usuario = request.POST.get('username')
@@ -1754,6 +1759,7 @@ def contrapartida_rh_criar_multiplos(request):
 #####################################
 # CONTRAPARTIDA REALIZADA ListView  #
 #####################################
+
 class contrapartida_realizada_list(ListView):
     model = projeto  # Define o modelo explicitamente
     template_name = "contrapartida/contrapartida_realizada_list.html"
@@ -1895,7 +1901,7 @@ def contrapartida_realizada_detalhes(request, projeto_id):
 ################################
 # CONTRAPARTIDA REALIZADA GERAL#
 ################################
-
+@login_required
 def contrapartida_realizada_geral(request):
     # ano padrão (atual) se não vier ou vier vazio
     hoje =datetime.today()
@@ -2049,7 +2055,7 @@ def contrapartida_realizada_geral(request):
 ##################################
 # TELAS CONTRAPARTIDA REALIZADA  #
 ##################################
-
+@login_required
 def contrapartida_realizada_equipamento(request):
     hoje = datetime.today()
     ano_atual = hoje.year
@@ -2137,6 +2143,7 @@ def contrapartida_realizada_equipamento(request):
 
     return render(request,"contrapartida/contrapartida_realizada_equipamento.html", context)
 
+@login_required
 def contrapartida_realizada_pesquisa(request):
     hoje = datetime.today()
     ano_atual = hoje.year
@@ -2226,6 +2233,7 @@ def contrapartida_realizada_pesquisa(request):
 
     return render(request, "contrapartida/contrapartida_realizada_pesquisa.html", context)
 
+@login_required
 def contrapartida_realizada_rh(request):
     hoje = datetime.today()
     ano_atual = hoje.year
@@ -2318,7 +2326,7 @@ def contrapartida_realizada_rh(request):
 ##############################
 # DOWNLOAD DO BANCO DE DADOS #
 ##############################
-
+@login_required
 def download_database(request):
     """View para download do arquivo do banco de dados"""
     file_path = os.path.join(settings.BASE_DIR, 'db.sqlite3')

@@ -11,6 +11,8 @@ urlpatterns = [
     path('', declaracoes_menu, name='declaracoes_menu'),
     path('menu/', declaracoes_menu, name='declaracoes_menu'),
 
+    # Menu documentos
+    path('documentos/', views.documentos_menu, name='documentos_menu'),
     # AJAX
     path('ajax/dados-projeto/', views.ajax_dados_projeto, name='ajax_dados_projeto'),
 

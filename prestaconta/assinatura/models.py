@@ -8,7 +8,7 @@ class DocumentoAssinatura(models.Model):
         ("refused", "Refused"),
         ("error", "Error"),
     ]
-    declaracao_id = models.ForeignKey("declaracao.Declaracao" ,on_delete=models.CASCADE)
+    declaracao_id = models.ForeignKey("declaracao.declaracao_documento" ,on_delete=models.CASCADE)
     zapsign_doc_id = models.CharField(max_length=255)
     status = models.CharField(max_length=50)
     signatario_nome = models.CharField(max_length=255)

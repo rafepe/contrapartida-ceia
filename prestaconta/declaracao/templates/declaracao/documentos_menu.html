@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block corpo %}
+<div class="container mt-4">
+    <h2>Central de Declarações</h2>
+    <hr>   
+
+    <!-- HEADER SEMESTRE (o seu já pronto) -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center">
+        <!-- Semestre Anterior -->
+            <form method="get" class="me-2">
+                {% if semestre == 1 %}
+                    <input type="hidden" name="ano" value="{{ ano|add:"-1" }}">
+                    <input type="hidden" name="semestre" value="2">
+                {% else %}
+                    <input type="hidden" name="ano" value="{{ ano }}">
+                    <input type="hidden" name="semestre" value="1">
+                {% endif %}
+                <button class="btn btn-outline-secondary">
+                    <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+            </form>
+    
+    
+            <div class="mx-3 text-center">
+                <h4 class="mb-0 text-primary">{{ semestre }}º Semestre de {{ ano }}</h4>
+                <small class="text-muted">
+                    {% if semestre == 1 %}Janeiro - Junho{% else %}Julho - Dezembro{% endif %}
+                </small>
+            </div>
+    
+            <!-- Semestre Seguinte -->
+            <form method="get">
+                {% if semestre == 2 %}
+                    <input type="hidden" name="ano" value="{{ ano|add:"1" }}">
+                    <input type="hidden" name="semestre" value="1">
+                {% else %}
+                    <input type="hidden" name="ano" value="{{ ano }}">
+                    <input type="hidden" name="semestre" value="2">
+                {% endif %}
+                <button class="btn btn-outline-secondary">
+                    Próximo <i class="fas fa-chevron-right"></i>
+                </button>
+            </form>
+    
+    
+    
+        </div>
+            <!-- Botão de atualizar -->
+            <button type="button" class="btn btn-outline-info" onclick="location.reload()">
+                <i class="fas fa-sync-alt"></i> Atualizar
+            </button>
+    </div>
+
+    <!-- TABELA -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Tipo</th>
+                        <th>Mês</th>
+                        <th>Status</th>
+                        <th width="300">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for doc in documentos %}
+                    <tr>
+                        <td>
+                            <strong>{{ doc.nome_projeto }}</strong><br>
+                            <small class="text-muted">{{ doc.nome_arquivo }}</small>
+                        </td>
+
+                        <td>
+                            <span class="badge bg-secondary">
+                                {{ doc.tipo }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ doc.mes|default:"-" }}
+                        </td>
+
+                        <td>
+                            {% if doc.status == "gerado" %}
+                                <span class="badge bg-secondary">Gerado</span>
+                            {% elif doc.status == "enviado" %}
+                                <span class="badge bg-warning text-dark">Enviado</span>
+                            {% elif doc.status == "assinado" %}
+                                <span class="badge bg-success">Assinado</span>
+                            {% elif doc.status == "erro" %}
+                                <span class="badge bg-danger">Erro</span>
+                            {% endif %}
+                        </td>
+                        
+                        <td>
+                        {% comment %}
+                            <!-- Download DOCX -->
+                            <a href="{{ doc.arquivo.url }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-download"></i>
+                            </a>
+
+                            <!-- Substituir -->
+                            <form method="post" action="{% url 'substituir_documento' doc.id %}" enctype="multipart/form-data" style="display:inline;">
+                                {% csrf_token %}
+                                <label class="btn btn-sm btn-outline-secondary mb-0">
+                                    <i class="fas fa-upload"></i>
+                                    <input type="file" name="arquivo" hidden onchange="this.form.submit()">
+                                </label>
+                            </form>
+
+                            <!-- Enviar para assinatura -->
+                            {% if doc.status == "gerado" %}
+                            <a href="{% url 'enviar_documento' doc.id %}" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-paper-plane"></i>
+                            </a>
+                            {% endif %}
+
+                            <!-- Atualizar status -->
+                            {% if doc.status == "enviado" %}
+                            <a href="{% url 'atualizar_status' doc.id %}" class="btn btn-sm btn-outline-warning">
+                                <i class="fas fa-sync"></i>
+                            </a>
+                            {% endif %}
+
+                            <!-- Baixar PDF -->
+                            {% if doc.status == "assinado" %}
+                            <a href="{% url 'baixar_assinado' doc.id %}" class="btn btn-sm btn-outline-dark">
+                                <i class="fas fa-file-pdf"></i>
+                            </a>
+                            {% endif %}
+                        {% endcomment %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">
+                            Nenhum documento encontrado para este semestre.
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+    
+</div>
+{% endblock %}

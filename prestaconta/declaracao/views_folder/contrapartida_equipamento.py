@@ -24,8 +24,8 @@ def gerar_declaracao_contrapartida_equipamento(request, projeto_id, mes, ano):
     declaracao_existente = declaracao_contrapartida_equipamento.objects.filter(mes=mes, ano=ano).first()
     if declaracao_existente:
         messages.info(request, f"Já existe uma declaração para {mes}/{ano}.")
-        url = reverse('declaracoes_menu')
-        return redirect(f'{url}?projeto={projeto_selecionado.nome}&mes={mes}&ano={ano}')
+        semestre = 1 if mes <= 6 else 2
+        return redirect(f"/declaracao/menu/?ano={ano}&semestre={semestre}&projeto_id={projeto_selecionado.id}")
 
     declaracao = declaracao_contrapartida_equipamento.objects.create(mes=mes, ano=ano)
 
@@ -39,8 +39,8 @@ def gerar_declaracao_contrapartida_equipamento(request, projeto_id, mes, ano):
     if not registros.exists():
         messages.warning(request, "Nenhum dado encontrado para gerar a declaração.")
         declaracao.delete()
-        url = reverse('declaracoes_menu')
-        return redirect(f'{url}?projeto={projeto_selecionado.nome}&mes={mes}&ano={ano}')
+        semestre = 1 if mes <= 6 else 2
+        return redirect(f"/declaracao/menu/?ano={ano}&semestre={semestre}&projeto_id={projeto_selecionado.id}")
 
     for (equip_nome, proj_id), grupo in groupby(
         registros,
@@ -71,8 +71,8 @@ def gerar_declaracao_contrapartida_equipamento(request, projeto_id, mes, ano):
         )
 
     messages.success(request, f"Declaração gerada para {mes}/{ano}.")
-    url = reverse('declaracoes_menu')
-    return redirect(f'{url}?projeto={projeto_selecionado.nome}&mes={mes}&ano={ano}')
+    semestre = 1 if mes <= 6 else 2
+    return redirect(f"/declaracao/menu/?ano={ano}&semestre={semestre}&projeto_id={projeto_selecionado.id}")
 
 
 class declaracao_contrapartida_equipamento_view(TemplateView):
@@ -107,6 +107,11 @@ class declaracao_contrapartida_equipamento_delete(DeleteView):
     fields = []
     template_name_suffix = '_delete'
     context_object_name = 'declaracao'
+    
 
     def get_success_url(self):
-        return reverse_lazy('declaracoes_menu')
+        obj = self.object
+        print('debug delete equipmamento',obj)
+        print('debug delete equipmamento more',self.request)
+        semestre = 1 if obj.mes <= 6 else 2
+        return f"/declaracao/menu/?ano={obj.ano}&semestre={semestre}"

@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from declaracao.models import projeto, declaracao_contrapartida_pesquisa, declaracao_contrapartida_so, declaracao_contrapartida_rh, declaracao_contrapartida_equipamento
 from datetime import date
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def declaracoes_menu(request):
     # Determina o semestre e ano padrão (semestre anterior ao atual)
     hoje = date.today()
@@ -34,25 +36,23 @@ def declaracoes_menu(request):
     ).order_by('nome')
 
     # Adaptação: permitir seleção de projeto, mês e ano, e mostrar declarações do mês/ano/projeto
-    nome_projeto = request.GET.get('projeto')
-    mes = request.GET.get('mes')
-    if mes is not None:
-        try:
-            mes = int(mes)
-        except ValueError:
-            mes = None
+
+    projeto_id = request.GET.get('projeto_id')
     projeto_obj = None
     declaracoes = {}
     tipos = ["pesquisa", "so", "rh", "equipamento"]
-    if nome_projeto:
-        projeto_obj = projeto.objects.filter(nome=nome_projeto).first()
-    if projeto_obj and mes and ano:
+
+    if projeto_id:
+        projeto_obj = projeto.objects.filter(id=projeto_id).first()        
+    if projeto_obj and ano and semestre:
+        meses = range(1, 7) if semestre==1 else range(7, 13)
+
         declaracoes = {
-            'pesquisa': declaracao_contrapartida_pesquisa.objects.filter(id_projeto=projeto_obj.id, mes=mes, ano=ano).first(),
-            'rh': declaracao_contrapartida_rh.objects.filter(id_projeto=projeto_obj.id, mes=mes, ano=ano).first(),
-            'so': declaracao_contrapartida_so.objects.filter(id_projeto=projeto_obj.id, mes=mes, ano=ano).first(),
-            'equipamento': declaracao_contrapartida_equipamento.objects.filter(mes=mes, ano=ano).first(),
-        }
+            'pesquisa': declaracao_contrapartida_pesquisa.objects.filter(id_projeto=projeto_obj.id, mes__in=meses, ano=ano).first(),
+            'rh': declaracao_contrapartida_rh.objects.filter(id_projeto=projeto_obj.id, mes__in=meses, ano=ano).first(),
+            'so': declaracao_contrapartida_so.objects.filter(id_projeto=projeto_obj.id, mes__in=meses, ano=ano).first(),
+            'equipamento': declaracao_contrapartida_equipamento.objects.filter(mes__in=meses, ano=ano).first(),
+        }        
 
     contexto = {
         'ano': ano,
@@ -60,9 +60,9 @@ def declaracoes_menu(request):
         'projetos': projetos,
         'meses': meses,
         'projeto': projeto_obj,
-        'mes': mes,
         'declaracoes': declaracoes,
         'tipos': tipos,
+        'projeto_id':projeto_id,
     }
 
     return render(request, 'declaracao/declaracoes_menu.html', contexto)

@@ -190,3 +190,33 @@ class declaracao_contrapartida_equipamento_item(models.Model):
         ]
 
 
+class declaracao_documento(models.Model):
+    TIPO_CHOICES = [
+        ("rh", "RH"),
+        ("pesquisa", "Pesquisa"),
+        ("so", "SO"),
+        ("equipamento", "Equipamento"),
+    ]
+
+    ano = models.IntegerField()
+    semestre = models.IntegerField()
+    mes = models.IntegerField(null=True, blank=True)
+
+    codigo_peia = models.CharField(max_length=50, blank=True)
+    nome_projeto = models.CharField(max_length=255, blank=True)
+    id_projeto=models.IntegerField(verbose_name="Projeto Id" ,null=True)
+
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    id_declaracao=models.IntegerField(verbose_name="Declaracao Id",null=True)
+    
+    caminho_arquivo = models.FileField(upload_to="documentos/")
+    nome_arquivo = models.CharField(max_length=255)
+
+    status = models.CharField(
+        max_length=30,
+        default="gerado"
+    )
+    # gerado | enviado | assinado | erro
+    
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)

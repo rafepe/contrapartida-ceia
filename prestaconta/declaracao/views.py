@@ -4,3 +4,4 @@ from .views_folder.contrapartida_so import *
 from .views_folder.contrapartida_equipamento import *
 from .views_folder.semestre import *
 from .views_folder.misc import *
+from .views_folder.documentos_menu import *
