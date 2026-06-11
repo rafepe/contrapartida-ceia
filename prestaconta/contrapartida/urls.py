@@ -81,6 +81,7 @@ urlpatterns = [
     path("contrapartida_realizada_equipamento/",contrapartida_realizada_equipamento,name="contrapartida_realizada_equipamento"),
     path("contrapartida_realizada_pesquisa/",contrapartida_realizada_pesquisa,name="contrapartida_realizada_pesquisa"),
     path("contrapartida_realizada_rh/",contrapartida_realizada_rh,name="contrapartida_realizada_rh"),
+    path("relatorio_horas/", relatorio_horas, name="relatorio_horas"),
 
     path('upload/', views.upload_contracheque, name='upload_contracheque'),
     

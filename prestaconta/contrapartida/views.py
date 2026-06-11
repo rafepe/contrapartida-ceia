@@ -2330,6 +2330,110 @@ def contrapartida_realizada_rh(request):
 
     return render(request, "contrapartida/contrapartida_realizada_rh.html", context)
 
+##########################
+# RELATORIO HORAS        #
+##########################
+
+@login_required
+def relatorio_horas(request):
+    hoje = datetime.today()
+    ano_atual = hoje.year
+    semestre_atual = 1 if hoje.month <= 6 else 2
+
+    ano_str = request.GET.get("ano")
+    semestre_str = request.GET.get("semestre")
+
+    if semestre_atual == 1:
+        semestre_default = 2
+        ano_default = ano_atual - 1
+    else:
+        semestre_default = 1
+        ano_default = ano_atual
+
+    ano = int(ano_str) if ano_str and ano_str.isdigit() else ano_default
+    semestre = int(semestre_str) if semestre_str and semestre_str.isdigit() else semestre_default
+
+    if semestre == 1:
+        inicio_semestre = datetime(ano, 1, 1)
+        fim_semestre = datetime(ano, 6, 30)
+    else:
+        inicio_semestre = datetime(ano, 7, 1)
+        fim_semestre = datetime(ano, 12, 31)
+
+    meses_semestre = gerar_meses_entre(inicio_semestre, fim_semestre)
+
+    meses_anos = [(m.month, m.year) for m in meses_semestre]
+
+    pessoas_ids = salario.objects.filter(
+        mes__in=[m for m, _ in meses_anos],
+        ano__in=list({y for _, y in meses_anos}),
+    ).values_list('id_pessoa', flat=True).distinct()
+
+    pessoas_qs = pessoa.objects.filter(id__in=pessoas_ids).order_by('nome')
+
+    tabela = []
+
+    for pessoa_obj in pessoas_qs:
+        limite_totais = 0
+        meses_com_salario = 0
+        dados_pessoa = {
+            "nome": pessoa_obj.nome,
+            "cpf": pessoa_obj.cpf or "",
+            "horas_media": 0,
+            "meses": []
+        }
+
+        for mes in meses_semestre:
+            sal = salario.objects.filter(
+                id_pessoa=pessoa_obj,
+                ano=mes.year,
+                mes=mes.month
+            ).first()
+
+            if sal:
+                horas_usadas_pesquisa = contrapartida_pesquisa.objects.filter(
+                    id_salario__id_pessoa=pessoa_obj,
+                    id_salario__mes=mes.month,
+                    id_salario__ano=mes.year
+                ).aggregate(total=Sum('horas_alocadas'))['total'] or 0
+
+                horas_usadas_rh = contrapartida_rh.objects.filter(
+                    id_salario__id_pessoa=pessoa_obj,
+                    id_salario__mes=mes.month,
+                    id_salario__ano=mes.year
+                ).aggregate(total=Sum('horas_alocadas'))['total'] or 0
+
+                utilizados = horas_usadas_pesquisa + horas_usadas_rh
+                limite = sal.horas_limite if sal.horas_limite else sal.horas
+                faltante = limite - utilizados
+
+                limite_totais += limite
+                meses_com_salario += 1
+
+                dados_pessoa["meses"].append({
+                    "utilizados": utilizados,
+                    "faltante": faltante,
+                    "tem_salario": True,
+                })
+            else:
+                dados_pessoa["meses"].append({
+                    "utilizados": None,
+                    "faltante": None,
+                    "tem_salario": False,
+                })
+
+        dados_pessoa["horas_media"] = round(limite_totais / meses_com_salario, 1) if meses_com_salario else 0
+        tabela.append(dados_pessoa)
+
+    context = {
+        "ano": ano,
+        "semestre": semestre,
+        "tabela": tabela,
+        "meses": meses_semestre,
+    }
+
+    return render(request, "contrapartida/relatorio_horas.html", context)
+
 ##############################
 # DOWNLOAD DO BANCO DE DADOS #
 ##############################

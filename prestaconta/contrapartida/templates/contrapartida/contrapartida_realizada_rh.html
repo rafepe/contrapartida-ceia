@@ -83,7 +83,7 @@
         
                     <td>{{ pesq.nome }}</td>
                     <td>{{ pesq.cpf }}</td>
-                    <td class="bg-warning fw-bold">{{ pesq.horas_media }}</td>
+                    <td class="bg-warning fw-bold">{{ pesq.horas_media|floatformat:"-1" }}</td>
         
                     {% for valor in pesq.meses %}
                         <td>R$ {{ valor|floatformat:2 }}</td>

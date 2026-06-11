@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block corpo %}
+
+<style>
+    .tabela-horas {
+        font-size: 0.74rem;
+        width: 100%;
+    }
+    .tabela-horas th,
+    .tabela-horas td {
+        padding: 3px 5px;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+    .col-nome {
+        min-width: 160px;
+        max-width: 220px;
+        white-space: normal;
+    }
+    td.col-nome { text-align: left; }
+    .col-cpf   { min-width: 88px; }
+    .col-media { min-width: 54px; }
+    .col-valor { min-width: 44px; }
+</style>
+
+<div class="container-fluid mt-4">
+<h2>Relatório de Horas</h2>
+<hr>
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="d-flex align-items-center">
+        <!-- Semestre Anterior -->
+        <form method="get" class="me-2">
+            {% if semestre == 1 %}
+                <input type="hidden" name="ano" value="{{ ano|add:"-1" }}">
+                <input type="hidden" name="semestre" value="2">
+            {% else %}
+                <input type="hidden" name="ano" value="{{ ano }}">
+                <input type="hidden" name="semestre" value="1">
+            {% endif %}
+            <button class="btn btn-outline-secondary btn-sm">
+                &lsaquo; Anterior
+            </button>
+        </form>
+
+        <div class="mx-3 text-center">
+            <h4 class="mb-0 text-primary">{{ semestre }}º Semestre de {{ ano }}</h4>
+            <small class="text-muted">
+                {% if semestre == 1 %}Janeiro - Junho{% else %}Julho - Dezembro{% endif %}
+            </small>
+        </div>
+
+        <!-- Semestre Seguinte -->
+        <form method="get">
+            {% if semestre == 2 %}
+                <input type="hidden" name="ano" value="{{ ano|add:"1" }}">
+                <input type="hidden" name="semestre" value="1">
+            {% else %}
+                <input type="hidden" name="ano" value="{{ ano }}">
+                <input type="hidden" name="semestre" value="2">
+            {% endif %}
+            <button class="btn btn-outline-secondary btn-sm">
+                Próximo &rsaquo;
+            </button>
+        </form>
+    </div>
+
+    <button type="button" class="btn btn-outline-info btn-sm" onclick="location.reload()">
+        &#x21bb; Atualizar
+    </button>
+</div>
+
+{% if tabela %}
+{% with ncols=meses|length %}
+<table class="table table-bordered table-sm tabela-horas text-center">
+    <thead class="table-secondary">
+    <tr>
+        <th class="col-nome" rowspan="3">Pessoa</th>
+        <th class="col-cpf"  rowspan="3">CPF</th>
+        <th class="col-media" rowspan="3">Méd.<br>Horas</th>
+        <th colspan="{{ ncols|add:ncols }}">Controle</th>
+    </tr>
+    <tr>
+        {% for mes in meses %}
+            <th class="col-valor" colspan="2">{{ mes|date:"M/y" }}</th>
+        {% endfor %}
+    </tr>
+    <tr class="table-light">
+        {% for mes in meses %}
+            <th class="col-valor text-success">Util.</th>
+            <th class="col-valor text-danger">Falt.</th>
+        {% endfor %}
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for pessoa in tabela %}
+    <tr>
+        <td class="col-nome">{{ pessoa.nome }}</td>
+        <td class="col-cpf">{{ pessoa.cpf }}</td>
+        <td class="col-media bg-warning fw-bold">{{ pessoa.horas_media|floatformat:"-1" }}</td>
+        {% for m in pessoa.meses %}
+            {% if m.tem_salario %}
+                <td class="col-valor text-success">{{ m.utilizados|floatformat:"-2" }}</td>
+                <td class="col-valor {% if m.faltante < 0 %}text-danger fw-bold{% else %}text-secondary{% endif %}">
+                    {{ m.faltante|floatformat:"-2" }}
+                </td>
+            {% else %}
+                <td class="col-valor text-muted">-</td>
+                <td class="col-valor text-muted">-</td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endwith %}
+{% else %}
+<p class="text-muted"><em>Nenhuma pessoa com salário registrado neste semestre.</em></p>
+{% endif %}
+
+</div>
+
+{% endblock %}
