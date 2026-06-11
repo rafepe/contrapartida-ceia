@@ -60,6 +60,79 @@
             margin-left: 260px;
             padding: 20px;
         }
+        .sb-view a {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .sb-view a:hover {
+            background: rgba(0,0,0,0.08);
+        }
+
+        .sb-section-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 4px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .sb-section-btn:hover {
+            background: rgba(0,0,0,0.08);
+        }
+
+        .sb-back-btn {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #666;
+        }
+
+        .sb-label {
+            display: block;
+            padding: 8px 12px 2px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #999;
+            font-weight: 600;
+        }
+
+        .sb-divider {
+            border-top: 1px solid rgba(0,0,0,0.1);
+            margin: 8px 0;
+        }
+        .sb-logo-btn {
+            display: block;
+            width: 100%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 0.5rem 0;
+            margin-bottom: 0.5rem;
+            color: inherit;
+        }
+
+        .sb-logo-btn:hover {
+            opacity: 0.7;
+        }
+
     </style>
 </head>
 
@@ -67,27 +140,64 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <h5 class="text-center mb-2">Menu</h5>
+        <button class="sb-logo-btn" onclick="sbGoTo('home')">Menu</button>
+        <!--h5 class="text-center mb-2">Menu</h5-->
 
-        <a href="{% url 'projeto_menu' %}">Projetos</a>
-        <a href="{% url 'equipamento_menu' %}">Equipamentos</a>
-        <a href="{% url 'pessoa_menu' %}">Pessoas</a>
-        <a href="{% url 'salario_menu' %}">Salários</a>
-        <a href="{% url 'upload_contracheque' %}">Contracheques</a>
-        <a href="{% url 'verifica_contracheque' %}">Verifica Contracheque</a>
-        <a href="{% url 'contrapartida_pesquisa_menu' %}">Contrapartida Pesquisa</a>
-        <a href="{% url 'contrapartida_rh_menu' %}">Contrapartida RH</a>
-        <a href="{% url 'contrapartida_equipamento_menu' %}">Contrapartida Equipamentos</a>
-        <a href="{% url 'contrapartida_so_menu' %}">Contrapartida SO</a>
-        <a href="{% url 'contrapartida_realizada_equipamento' %}">Tela Equipamento</a>
-        <a href="{% url 'contrapartida_realizada_pesquisa' %}">Tela Pesquisa</a>
-        <a href="{% url 'contrapartida_realizada_rh' %}">Tela RH</a>
-        <a href="{% url 'contrapartida_realizada_geral' %}">Contrapartida Geral</a>
-        <a href="{% url 'importar_csv' %}">Importar CSV</a>
-        <a href="{% url 'declaracoes_menu' %}">Gerar Declarações</a>
-        <a href="{% url 'download_cc_semestre' %}">Contracheques Semestre</a>
-        <a href="{% url 'gerar_declaracoes_semestre' %}">Declarações Semestre</a>
-        <a href="{% url 'logout' %}">Logout</a>
+        <!-- Vista: Menu principal -->
+        <div id="sb-home" class="sb-view">
+            <button class="sb-section-btn" onclick="sbGoTo('projetos')">
+                 Projetos e Pessoas
+            </button>
+            <button class="sb-section-btn" onclick="sbGoTo('contrapartidas')">
+                 Contrapartidas
+            </button>
+            <button class="sb-section-btn" onclick="sbGoTo('declaracoes')">
+                 Declarações
+            </button>
+            <button class="sb-section-btn" onclick="sbGoTo('acoes')">
+                 Ações
+            </button>
+            <div class="sb-divider"></div>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
+
+        <!-- Vista: Projetos e Pessoas -->
+        <div id="sb-projetos" class="sb-view" style="display:none">            
+            <a href="{% url 'projeto_menu' %}">Projetos</a>
+            <a href="{% url 'pessoa_menu' %}">Pessoas</a>
+            <a href="{% url 'equipamento_menu' %}">Equipamentos</a>
+            <a href="{% url 'salario_menu' %}">Salários</a>
+        </div>
+
+        <!-- Vista: Contrapartidas -->
+        <div id="sb-contrapartidas" class="sb-view" style="display:none">            
+            <small class="sb-label">Menus</small>
+            <a href="{% url 'contrapartida_pesquisa_menu' %}">Pesquisa</a>
+            <a href="{% url 'contrapartida_rh_menu' %}">RH</a>
+            <a href="{% url 'contrapartida_equipamento_menu' %}">Equipamentos</a>
+            <a href="{% url 'contrapartida_so_menu' %}">SO</a>
+            <small class="sb-label">Realizadas</small>
+            <a href="{% url 'contrapartida_realizada_pesquisa' %}">Tela Pesquisa</a>
+            <a href="{% url 'contrapartida_realizada_rh' %}">Tela RH</a>
+            <a href="{% url 'contrapartida_realizada_equipamento' %}">Tela Equipamento</a>
+            <a href="{% url 'contrapartida_realizada_geral' %}">Geral</a>
+        </div>
+
+        <!-- Vista: Declarações -->
+        <div id="sb-declaracoes" class="sb-view" style="display:none">
+            
+            <a href="{% url 'declaracoes_menu' %}">Gerar Declarações</a>
+            <a href="{% url 'download_cc_semestre' %}">Contracheques Semestre</a>
+            <a href="{% url 'gerar_declaracoes_semestre' %}">Declarações Semestre</a>
+            <a href="{% url 'documentos_menu' %}">Documentos</a>
+        </div>
+
+        <!-- Vista: Ações -->
+        <div id="sb-acoes" class="sb-view" style="display:none">            
+            <a href="{% url 'upload_contracheque' %}">Upload Contracheque</a>
+            <a href="{% url 'verifica_contracheque' %}">Verifica Contracheque</a>
+            <a href="{% url 'importar_csv' %}">Importar CSV</a>
+        </div>
     </div>
 
 
@@ -122,5 +232,19 @@
 
 
 </body>
-
+<script>
+    function sbGoTo(view) {
+        document.querySelectorAll('.sb-view').forEach(function(el) {
+            el.style.display = 'none';
+        });
+        document.getElementById('sb-' + view).style.display = 'block';
+        localStorage.setItem('sb-active', view);
+    }
+    
+    // Restaura a aba ativa ao recarregar
+    (function() {
+        var active = localStorage.getItem('sb-active') || 'home';
+        sbGoTo(active);
+    })();
+    </script>
 </html>
