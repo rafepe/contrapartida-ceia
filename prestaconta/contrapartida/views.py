@@ -139,7 +139,7 @@ class projeto_menu(SingleTableView):
 
 class projeto_create(CreateView):
     model = projeto
-    fields = ['nome', 'peia', 'data_inicio', 'data_fim', 'valor_total', 'valor_financiado', 'valor_so_ptr', 'valor_funape', 'tx_adm_ue', 'contrapartida', 'ativo']
+    fields = ['nome', 'titulo', 'peia', 'data_inicio', 'data_fim', 'valor_total', 'valor_financiado', 'valor_so_ptr', 'valor_funape', 'tx_adm_ue', 'contrapartida', 'coordenador', 'notas', 'ativo']
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.has_perm("contrapartida.create_projeto"):
@@ -170,9 +170,9 @@ class projeto_update(UpdateView):
             return redirect('projeto_menu')
    
     model = projeto
-    fields = ['nome', 'peia', 'data_inicio', 'data_fim', 'valor_total', 'valor_financiado', 'valor_so_ptr', 'valor_funape', 'tx_adm_ue', 'contrapartida', 'ativo']
+    fields = ['nome', 'titulo', 'peia', 'data_inicio', 'data_fim', 'valor_total', 'valor_financiado', 'valor_so_ptr', 'valor_funape', 'tx_adm_ue', 'contrapartida', 'coordenador', 'notas', 'ativo']
     def get_success_url(self):
-        return reverse_lazy('projeto_menu')   
+        return reverse_lazy('projeto_menu')
 
 class projeto_delete(DeleteView):
     def dispatch(self, request, *args, **kwargs):
@@ -1439,13 +1439,20 @@ def contrapartida_so_criar_multiplos(request):
     
     # Lista de projetos para o select
     lista_projetos = projeto.objects.filter(ativo=True).order_by('peia')
-    
+
+    cp_mensal_so = None
+    if projeto_obj and projeto_obj.num_mes:
+        so_da_ue = round(projeto_obj.valor_total * projeto_obj.tx_adm_ue / 100, 2) - projeto_obj.valor_funape
+        cp_ue_so = so_da_ue - projeto_obj.valor_so_ptr
+        cp_mensal_so = round(cp_ue_so / projeto_obj.num_mes, 2)
+
     context = {
         'formset': formset,
         'projetos': lista_projetos,
         'projeto_obj': projeto_obj,
+        'cp_mensal_so': cp_mensal_so,
     }
-    
+
     return render(request, 'contrapartida/contrapartida_so_form_multiplo.html', context)
 
 ##########################

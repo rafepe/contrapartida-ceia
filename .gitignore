@@ -25,6 +25,7 @@ __pycache__/
 # Ignore configurações e credenciais locais (se houver)
 .env
 *.local
+.claude.md
 
 # Ignore arquivos gerados pelo sistema operacional
 .DS_Store

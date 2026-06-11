@@ -31,6 +31,18 @@
             </div>
 
             <div class="row justify-content-center" style="line-height: 1;">
+              <div class="col-md-8 col-sm-12">
+                {% bootstrap_field form.titulo placeholder='Digite o título do projeto' %}
+              </div>
+            </div>
+
+            <div class="row justify-content-center" style="line-height: 1;">
+              <div class="col-md-4 col-sm-6 col-xs-12">
+                {% bootstrap_field form.coordenador %}
+              </div>
+            </div>
+
+            <div class="row justify-content-center" style="line-height: 1;">
                 <div class="col-md-4 col-sm-6 col-xs-12">
                   <label for="data_inicio" class="form-label">Data de Início</label>
                   <input type="date" id="data_inicio" name="data_inicio" class="form-control" value="{{ form.data_inicio.value|date:'Y-m-d' }}" />
@@ -71,6 +83,12 @@
             <div class="col-md-1 col-sm-1 col-xs-1"><br><br>
                 {% bootstrap_field form.ativo placeholder='' %}
                 </div>
+            </div>
+
+            <div class="row justify-content-center" style="line-height: 1;">
+              <div class="col-md-8 col-sm-12">
+                {% bootstrap_field form.notas placeholder='Observações sobre o projeto' %}
+              </div>
             </div>
 
             <div class="row justify-content-center">

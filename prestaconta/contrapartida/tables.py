@@ -12,20 +12,20 @@ locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
 class projeto_table(tables.Table):
     nome = tables.LinkColumn("projeto_update",orderable=True, args=[A("pk")])
+    titulo = tables.LinkColumn("projeto_update", orderable=True, args=[A("pk")], verbose_name="Título")
     peia = tables.LinkColumn("projeto_update",orderable=True ,args=[A("pk")])
     data_inicio = tables.LinkColumn("projeto_update", args=[A("pk")])
     data_fim = tables.LinkColumn("projeto_update", args=[A("pk")])
     valor_total = tables.LinkColumn("projeto_update", args=[A("pk")])
     contrapartida = tables.LinkColumn("projeto_update", args=[A("pk")], verbose_name="Contrapartida Prometida")
-
-    #excluir = tables.Column(empty_values=(), orderable=False, verbose_name="Excluir")
+    coordenador = tables.Column(accessor="coordenador.nome", verbose_name="Coordenador", orderable=False)
 
     class Meta:
         model = projeto
         attrs = {"class": "table thead-light table-striped table-hover"}
         template_name = "django_tables2/bootstrap4.html"
-        fields =    ("nome", "peia", "data_inicio", "data_fim","contrapartida" ,"valor_total")
-        sequence =  ("peia", "nome",  "data_inicio", "data_fim","contrapartida", "valor_total")
+        fields =    ("peia", "nome", "titulo", "coordenador", "data_inicio", "data_fim", "contrapartida", "valor_total")
+        sequence =  ("peia", "nome", "titulo", "coordenador", "data_inicio", "data_fim", "contrapartida", "valor_total")
     
     def render_data_inicio(self, value):
         # Formatar a data no formato DD/MM/YYYY

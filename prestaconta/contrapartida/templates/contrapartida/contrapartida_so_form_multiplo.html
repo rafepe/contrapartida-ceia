@@ -54,6 +54,16 @@
         </div>
 
         {% if projeto_obj %}
+        <!-- CP MENSAL SO (referência para o JS) -->
+        <div id="cp-mensal-info"
+             data-cp-mensal="{{ cp_mensal_so|default:'0' }}"
+             class="alert alert-info py-2 mb-3">
+            <strong>CP Mensal SO do projeto:</strong>
+            R$ {{ cp_mensal_so|default:"—" }}
+            &nbsp;—&nbsp;
+            <small class="text-muted">Preencha "Nº de meses" para sugerir o valor automaticamente.</small>
+        </div>
+
         <!-- FORMSET DE CONTRAPARTIDAS -->
         {{ formset.management_form }}
 
@@ -66,10 +76,21 @@
                 
                 <div class="row align-items-end">
                     <!-- ano-mes -->
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         {% bootstrap_field form.ano_mes show_label=True %}
                     </div>
-                    
+
+                    <!-- numero de meses (auxiliar, não persiste) -->
+                    <div class="col-md-2">
+                        <div class="mb-3">
+                            <label class="form-label">Nº de meses</label>
+                            <input type="number"
+                                   class="form-control num-meses-input"
+                                   min="1"
+                                   placeholder="Ex: 3">
+                        </div>
+                    </div>
+
                     <!-- valor -->
                     <div class="col-md-3">
                         {% bootstrap_field form.valor show_label=True %}
@@ -253,6 +274,38 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Inicializa estado dos botões
     updateRemoveButtons();
+
+    // Auto-cálculo de valor a partir de "nº de meses"
+    const cpMensalInfo = document.getElementById('cp-mensal-info');
+    const cpMensal = cpMensalInfo ? parseFloat(cpMensalInfo.dataset.cpMensal) || 0 : 0;
+
+    function bindNumMeses(row) {
+        const numMesesInput = row.querySelector('.num-meses-input');
+        if (!numMesesInput) return;
+
+        numMesesInput.addEventListener('input', function () {
+            const n = parseFloat(this.value);
+            if (!isNaN(n) && n > 0 && cpMensal > 0) {
+                const valorInput = row.querySelector('input[name$="-valor"]');
+                if (valorInput) {
+                    valorInput.value = (cpMensal * n).toFixed(2);
+                }
+            }
+        });
+    }
+
+    // Vincula nas linhas já renderizadas
+    if (container) {
+        container.querySelectorAll('.formset-row').forEach(bindNumMeses);
+    }
+
+    // Vincula em novas linhas ao adicionar
+    if (addButton) {
+        addButton.addEventListener('click', function () {
+            const rows = container.querySelectorAll('.formset-row');
+            bindNumMeses(rows[rows.length - 1]);
+        });
+    }
 });
 </script>
 

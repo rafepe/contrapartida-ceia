@@ -11,6 +11,7 @@ import re
 class projeto(models.Model):
     id = models.AutoField(primary_key=True)
     nome = models.CharField(max_length=255)
+    titulo = models.CharField(max_length=225, verbose_name='Título do projeto', default='')
     peia = models.CharField(max_length=255, verbose_name="PEIA")
     data_inicio = models.DateField(verbose_name="Data início")
     data_fim = models.DateField(verbose_name="Data fim")
@@ -20,6 +21,8 @@ class projeto(models.Model):
     valor_funape = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, verbose_name="Valor Funape")
     tx_adm_ue = models.DecimalField(max_digits=5, decimal_places=2, default=15.00, verbose_name="Tx Admin. Unidade Embrapii")
     contrapartida = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, verbose_name='Contrapartida prometida')
+    coordenador = models.ForeignKey('pessoa', on_delete=models.CASCADE, verbose_name='Coordenador', null=False)
+    notas = models.TextField(max_length=1000, null=True, blank=True, verbose_name='Notas')
     ativo = models.BooleanField(default=True, verbose_name='Ativo')
 
     def __str__(self):
