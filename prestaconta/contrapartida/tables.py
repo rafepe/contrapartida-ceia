@@ -110,8 +110,8 @@ class pessoa_table(tables.Table):
 
 class salario_table(tables.Table):
     pessoa = tables.LinkColumn("salario_update", args=[A("pk")], accessor='id_pessoa.nome', verbose_name="Pessoa")
-    ano = tables.LinkColumn("salario_update", args=[A("pk")], verbose_name="Ano de Referência")
-    mes = tables.LinkColumn("salario_update", args=[A("pk")], verbose_name="Mês de Referência")
+    ano = tables.LinkColumn("salario_update", args=[A("pk")], verbose_name="Ano")
+    mes = tables.LinkColumn("salario_update", args=[A("pk")], verbose_name="Mês")
     valor = tables.LinkColumn("salario_update", args=[A("pk")], verbose_name="Valor")
     horas = tables.LinkColumn("salario_update", args=[A("pk")], verbose_name="Horas mensais")
     valor_hora = tables.Column(empty_values=(),verbose_name="Valor-Hora", orderable=False)

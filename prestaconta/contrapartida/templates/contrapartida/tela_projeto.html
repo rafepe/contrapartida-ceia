@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block corpo %}
+
+<div class="container-fluid mt-4">
+<h2>Tela Projeto</h2>
+<hr>
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="d-flex align-items-center">
+
+        <!-- Semestre Anterior -->
+        <form method="get" class="me-2">
+            {% if semestre == 1 %}
+                <input type="hidden" name="ano" value="{{ ano|add:"-1" }}">
+                <input type="hidden" name="semestre" value="2">
+            {% else %}
+                <input type="hidden" name="ano" value="{{ ano }}">
+                <input type="hidden" name="semestre" value="1">
+            {% endif %}
+            <button type="submit" class="btn btn-outline-secondary">
+                <i class="fas fa-chevron-left"></i> Anterior
+            </button>
+        </form>
+
+        <div class="mx-3 text-center">
+            <h4 class="mb-0 text-primary">{{ semestre }}º Semestre de {{ ano }}</h4>
+            <small class="text-muted">
+                {% if semestre == 1 %}Janeiro - Junho{% else %}Julho - Dezembro{% endif %}
+            </small>
+        </div>
+
+        <!-- Semestre Seguinte -->
+        <form method="get">
+            {% if semestre == 2 %}
+                <input type="hidden" name="ano" value="{{ ano|add:"1" }}">
+                <input type="hidden" name="semestre" value="1">
+            {% else %}
+                <input type="hidden" name="ano" value="{{ ano }}">
+                <input type="hidden" name="semestre" value="2">
+            {% endif %}
+            <button type="submit" class="btn btn-outline-secondary">
+                Próximo <i class="fas fa-chevron-right"></i>
+            </button>
+        </form>
+
+    </div>
+
+    <div class="d-flex gap-2">
+        <!-- Selecionar Colunas -->
+        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalColunas">
+            <i class="fas fa-table"></i> Selecionar Colunas
+        </button>
+        <!-- Atualizar -->
+        <button type="button" class="btn btn-outline-info" onclick="location.reload()">
+            <i class="fas fa-sync-alt"></i> Atualizar
+        </button>
+    </div>
+</div>
+
+{% if rows %}
+<div class="table-responsive">
+    <table class="table table-bordered table-hover text-center align-middle" id="tabela-projetos">
+        <thead class="table-secondary">
+            <tr>
+                <!-- Colunas padrão -->
+                <th data-col="peia">PEIA</th>
+                <th data-col="nome">Nome</th>
+                <th data-col="data_inicio">Início</th>
+                <th data-col="data_fim">Fim</th>
+                <th data-col="contrapartida">Contrapartida</th>
+                <th data-col="saldo">Saldo</th>
+                <!-- Colunas extras (ocultas por padrão) -->
+                <th data-col="titulo" style="display:none">Título</th>
+                <th data-col="valor_total" style="display:none">Valor Total</th>
+                <th data-col="valor_financiado" style="display:none">Valor Financiado</th>
+                <th data-col="valor_so_ptr" style="display:none">Valor SO PTR</th>
+                <th data-col="valor_funape" style="display:none">Valor Funape</th>
+                <th data-col="tx_adm_ue" style="display:none">Tx Adm UE (%)</th>
+                <th data-col="coordenador" style="display:none">Coordenador</th>
+                <th data-col="notas" style="display:none">Notas</th>
+                <th data-col="ativo" style="display:none">Ativo</th>
+                <th data-col="num_mes" style="display:none">Nº Meses</th>
+                <th data-col="contrapartida_max" style="display:none">Contrapartida Máx.</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td data-col="peia">{{ row.obj.peia }}</td>
+                <td data-col="nome" class="text-start">{{ row.obj.nome }}</td>
+                <td data-col="data_inicio">{{ row.obj.data_inicio|date:"d/m/Y" }}</td>
+                <td data-col="data_fim">{{ row.obj.data_fim|date:"d/m/Y" }}</td>
+                <td data-col="contrapartida">R$ {{ row.obj.contrapartida|floatformat:2 }}</td>
+                <td data-col="saldo"
+                    style="font-weight:bold;
+                           background-color:{% if row.saldo < 0 %}#f8d7da{% else %}#d4edda{% endif %};
+                           color:{% if row.saldo < 0 %}#721c24{% else %}#155724{% endif %};">
+                    R$ {{ row.saldo_fmt }}
+                </td>
+                <!-- Colunas extras -->
+                <td data-col="titulo" style="display:none">{{ row.obj.titulo }}</td>
+                <td data-col="valor_total" style="display:none">R$ {{ row.obj.valor_total|floatformat:2 }}</td>
+                <td data-col="valor_financiado" style="display:none">R$ {{ row.obj.valor_financiado|floatformat:2 }}</td>
+                <td data-col="valor_so_ptr" style="display:none">R$ {{ row.obj.valor_so_ptr|floatformat:2 }}</td>
+                <td data-col="valor_funape" style="display:none">R$ {{ row.obj.valor_funape|floatformat:2 }}</td>
+                <td data-col="tx_adm_ue" style="display:none">{{ row.obj.tx_adm_ue }}%</td>
+                <td data-col="coordenador" style="display:none">{{ row.obj.coordenador }}</td>
+                <td data-col="notas" style="display:none" class="text-start">{{ row.obj.notas|default:"-" }}</td>
+                <td data-col="ativo" style="display:none">{% if row.obj.ativo %}Sim{% else %}Não{% endif %}</td>
+                <td data-col="num_mes" style="display:none">{{ row.obj.num_mes }}</td>
+                <td data-col="contrapartida_max" style="display:none">R$ {{ row.obj.contrapartida_max|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% else %}
+<p class="text-muted"><em>Nenhum projeto ativo neste semestre.</em></p>
+{% endif %}
+
+</div>
+
+<!-- Modal Selecionar Colunas -->
+<div class="modal fade" id="modalColunas" tabindex="-1" aria-labelledby="modalColunasLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalColunasLabel">
+                    <i class="fas fa-table me-2"></i>Selecionar Colunas
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small mb-3">As colunas padrão (PEIA, Nome, Início, Fim, Contrapartida, Saldo) são sempre exibidas.</p>
+                {% for col in colunas_extras %}
+                <div class="form-check">
+                    <input class="form-check-input col-toggle" type="checkbox"
+                           id="chk-{{ col.key }}" data-col="{{ col.key }}">
+                    <label class="form-check-label" for="chk-{{ col.key }}">
+                        {{ col.label }}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    var STORAGE_KEY = 'tela-projeto-colunas';
+
+    function colsAtivas() {
+        try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+        catch (e) { return []; }
+    }
+
+    function aplicarColunas(ativas) {
+        document.querySelectorAll('[data-col]').forEach(function (el) {
+            var col = el.getAttribute('data-col');
+            var padrao = ['peia','nome','data_inicio','data_fim','contrapartida','saldo'];
+            if (padrao.indexOf(col) !== -1) {
+                el.style.display = '';
+            } else {
+                el.style.display = ativas.indexOf(col) !== -1 ? '' : 'none';
+            }
+        });
+    }
+
+    function sincronizarCheckboxes(ativas) {
+        document.querySelectorAll('.col-toggle').forEach(function (chk) {
+            chk.checked = ativas.indexOf(chk.dataset.col) !== -1;
+        });
+    }
+
+    // aplica ao carregar
+    var ativas = colsAtivas();
+    aplicarColunas(ativas);
+
+    document.getElementById('modalColunas').addEventListener('show.bs.modal', function () {
+        sincronizarCheckboxes(colsAtivas());
+    });
+
+    document.querySelectorAll('.col-toggle').forEach(function (chk) {
+        chk.addEventListener('change', function () {
+            var atual = colsAtivas();
+            var col = this.dataset.col;
+            if (this.checked) {
+                if (atual.indexOf(col) === -1) atual.push(col);
+            } else {
+                atual = atual.filter(function (c) { return c !== col; });
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(atual));
+            aplicarColunas(atual);
+        });
+    });
+})();
+</script>
+
+{% endblock %}

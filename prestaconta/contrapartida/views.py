@@ -16,7 +16,7 @@ from django.urls import reverse_lazy
 from django.utils.timezone import now
 from django.views.generic import ListView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .utils import format_br,gerar_meses_entre,aplicar_filtro_data,aplicar_filtro,contexto_filtros
+from .utils import format_br, gerar_meses_entre, aplicar_filtro_data, aplicar_filtro, contexto_filtros, tabela_calculo_contrapartidas
 from PyPDF2 import PdfReader
 import calendar
 import csv
@@ -1956,61 +1956,17 @@ def contrapartida_realizada_geral(request):
 
     dados_tabela = []
 
+    tipos_contrapartida = ['SO', 'Rh', 'Pesquisa', 'Equipamento', 'Prospeccao', 'Total', 'Diferenca', 'Saldo']
+
     for proj in projetos:
-        vlr_mensal_devido = (proj.contrapartida / proj.num_mes 
-                             if proj.num_mes else proj.contrapartida)
+        contrapartidas_ordenadas, vlr_mensal_devido = tabela_calculo_contrapartidas(proj)
 
-        contrapartidas_por_mes = defaultdict(lambda: {
-            'so': Decimal(0.0),
-            'rh': Decimal(0.0),
-            'pesquisa': Decimal(0.0),
-            'equipamento': Decimal(0.0),
-            'prospeccao': Decimal(0.0),
-            'total': Decimal(0.0),
-            'diferenca': Decimal(0.0),
-            'saldo': Decimal(0.0)
-        })
-
-        saldo = Decimal(0.0)
-        contrapartidas_ordenadas = {}
-
-        tipos_contrapartida = ['SO', 'Rh', 'Pesquisa', 'Equipamento', 'Prospeccao', 'Total', 'Diferenca', 'Saldo']
-        todos_meses = gerar_meses_entre(proj.data_inicio, proj.data_fim)
-
-        for date in todos_meses:
-            key = f"{date.year}-{date.month:02d}"
-            contrapartidas_por_mes[key]
-
-        # SO
-        for so in contrapartida_so_projeto.objects.filter(id_projeto=proj):
-            key = f"{so.ano}-{so.mes:02d}"
-            contrapartidas_por_mes[key]['so'] += Decimal(so.valor or 0)
-
-        # Pesquisa
-        for c in contrapartida_pesquisa.objects.filter(id_projeto=proj):
-            key = f"{c.id_salario.ano}-{c.id_salario.mes:02d}"
-            contrapartidas_por_mes[key]['pesquisa'] += c.valor_cp
-
-        # RH
-        for c in contrapartida_rh.objects.filter(id_projeto=proj):
-            key = f"{c.id_salario.ano}-{c.id_salario.mes:02d}"
-            contrapartidas_por_mes[key]['rh'] += c.valor_cp
-
-        # Equipamento
-        for ce in contrapartida_equipamento.objects.filter(id_projeto=proj):
-            key = f"{ce.ano}-{ce.mes:02d}"
-            contrapartidas_por_mes[key]['equipamento'] += ce.valor_cp
-
-        # Totais, diferença e saldo
-        for key, valores in sorted(contrapartidas_por_mes.items()):
-            valores['total'] = valores['equipamento'] + valores['pesquisa'] + valores['so'] + valores['rh']
-            valores['diferenca'] = valores['total'] - Decimal(vlr_mensal_devido)
-            saldo += valores['diferenca']
-            valores['saldo'] = saldo
-            contrapartidas_ordenadas[key] = valores
-
-        # Meses ordenados
         ano_mes = sorted(contrapartidas_ordenadas.keys(), key=lambda x: datetime.strptime(x, "%Y-%m"))
+
+        if not ano_mes:
+            continue
+
+        saldo_final = contrapartidas_ordenadas[ano_mes[-1]]['saldo']
 
         # Pivot
         dados_transpostos = defaultdict(dict)
@@ -2025,19 +1981,15 @@ def contrapartida_realizada_geral(request):
             dados_transpostos['Diferenca'][data] = valores['diferenca']
             dados_transpostos['Saldo'][data] = valores['saldo']
 
-        saldo_final=valores['saldo']
-
-
-
         linhas = []
         for tipo in tipos_contrapartida:
             linha = {
                 "tipo": tipo,
                 "valores": [
-                            {
-                                "raw": dados_transpostos[tipo].get(data, 0.0),
-                                "fmt": format_br(dados_transpostos[tipo].get(data, 0.0))
-                            } for data in ano_mes]
+                    {
+                        "raw": dados_transpostos[tipo].get(data, 0.0),
+                        "fmt": format_br(dados_transpostos[tipo].get(data, 0.0))
+                    } for data in ano_mes]
             }
             linhas.append(linha)
 
@@ -2047,7 +1999,7 @@ def contrapartida_realizada_geral(request):
             'linhas': linhas,
             'saldo': format_br(saldo_final),
             'devido': format_br(vlr_mensal_devido),
-            'valor_total':format_br(proj.contrapartida)
+            'valor_total': format_br(proj.contrapartida)
         })
 
     context = {
@@ -2058,6 +2010,77 @@ def contrapartida_realizada_geral(request):
     }
 
     return render(request, 'contrapartida/contrapartida_realizada_geral.html', context)
+
+################
+# TELA PROJETO #
+################
+@login_required
+def tela_projeto(request):
+    hoje = datetime.today()
+    ano_atual = hoje.year
+    semestre_atual = 1 if hoje.month <= 6 else 2
+
+    ano_str = request.GET.get("ano")
+    semestre_str = request.GET.get("semestre")
+
+    if semestre_atual == 1:
+        semestre_default = 2
+        ano_default = ano_atual - 1
+    else:
+        semestre_default = 1
+        ano_default = ano_atual
+
+    semestre = int(semestre_str) if semestre_str and semestre_str.isdigit() else semestre_default
+    ano = int(ano_str) if ano_str and ano_str.isdigit() else ano_default
+
+    if semestre == 1:
+        inicio_semestre = datetime(ano, 1, 1)
+        fim_semestre = datetime(ano, 6, 30)
+    else:
+        inicio_semestre = datetime(ano, 7, 1)
+        fim_semestre = datetime(ano, 12, 31)
+
+    projetos = projeto.objects.filter(
+        data_inicio__lte=fim_semestre,
+        data_fim__gt=inicio_semestre
+    ).order_by('nome')
+
+    colunas_extras = [
+        {'key': 'titulo',            'label': 'Título'},
+        {'key': 'valor_total',       'label': 'Valor Total'},
+        {'key': 'valor_financiado',  'label': 'Valor Financiado'},
+        {'key': 'valor_so_ptr',      'label': 'Valor SO PTR'},
+        {'key': 'valor_funape',      'label': 'Valor Funape'},
+        {'key': 'tx_adm_ue',         'label': 'Tx Adm UE (%)'},
+        {'key': 'coordenador',       'label': 'Coordenador'},
+        {'key': 'notas',             'label': 'Notas'},
+        {'key': 'ativo',             'label': 'Ativo'},
+        {'key': 'num_mes',           'label': 'Nº Meses'},
+        {'key': 'contrapartida_max', 'label': 'Contrapartida Máx.'},
+    ]
+
+    rows = []
+    for proj in projetos:
+        contrapartidas_ordenadas, _ = tabela_calculo_contrapartidas(proj)
+        if contrapartidas_ordenadas:
+            ultimo_mes = sorted(contrapartidas_ordenadas.keys())[-1]
+            saldo_final = contrapartidas_ordenadas[ultimo_mes]['saldo']
+        else:
+            saldo_final = Decimal(0)
+
+        rows.append({
+            'obj': proj,
+            'saldo': saldo_final,
+            'saldo_fmt': format_br(saldo_final),
+        })
+
+    context = {
+        'ano': ano,
+        'semestre': semestre,
+        'rows': rows,
+        'colunas_extras': colunas_extras,
+    }
+    return render(request, 'contrapartida/tela_projeto.html', context)
 
 ##################################
 # TELAS CONTRAPARTIDA REALIZADA  #
