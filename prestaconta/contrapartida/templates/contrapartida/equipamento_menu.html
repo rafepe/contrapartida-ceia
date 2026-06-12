@@ -8,12 +8,13 @@
 
 {% block titulo %}Equipamentos{% endblock %}
 {% block corpo %}
+<div class="container-fluid mt-4">
+    <h2>Equipamentos</h2>
+    <hr>
 
-<body>
     <div class="container">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <center>
-            <h1>Equipamentos</h1>
             {% render_table table %}
             <br>
             <a href="{% url 'equipamento_create' %}">
@@ -22,5 +23,5 @@
             </center>
         </div>
     </div>
-</body>
+</div>
 {% endblock %}

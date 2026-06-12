@@ -8,16 +8,16 @@
 
 {% block titulo %}Contrapartida Equipamento{% endblock %}
 {% block corpo %}
-<center>
-    {% include "blocos/filtro_padrao.html" with mostrar_peia=True mostrar_projeto=True mostrar_equipamento=True mostrar_ano=True mostrar_mes=True %}
-</center>
+<div class="container-fluid mt-4">
+    <h2>Contrapartida Equipamento</h2>
+    <hr>
+    <div class="mb-4">
+        {% include "blocos/filtro_padrao.html" with mostrar_peia=True mostrar_projeto=True mostrar_equipamento=True mostrar_ano=True mostrar_mes=True %}
+    </div>
 
-
-<body>
     <div class="container">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <center>
-            <h1>Contrapartida Equipamento</h1>
             {% render_table table %}
             <br>
             <a href="{% url 'contrapartida_equipamento_create' %}">
@@ -29,5 +29,5 @@
             </center>
         </div>
     </div>
-</body>
+</div>
 {% endblock %}

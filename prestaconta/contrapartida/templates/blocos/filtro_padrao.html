@@ -1,58 +1,83 @@
 <form method="GET" class="filtro-form">
+    <div class="d-flex align-items-center flex-wrap gap-2">
 
-    {% if mostrar_peia %}
-    <label>Peia:</label>
-    <input type="text" name="peia" value="{{ filtros.peia }}">
-    {% endif %}
+        {% if mostrar_peia %}
+        <div class="d-flex align-items-center gap-1">
+            <label class="text-nowrap mb-0 small">Peia:</label>
+            <input type="text" name="peia" value="{{ filtros.peia }}" class="form-control form-control-sm" style="width:110px;">
+        </div>
+        {% endif %}
 
-    {% if mostrar_projeto %}    
-        <label>Projeto:</label>
-        <input type="text" name="projeto" value="{{ filtros.projeto }}">
-    {% endif %}
+        {% if mostrar_projeto %}
+        <div class="d-flex align-items-center gap-1">
+            <label class="text-nowrap mb-0 small">Projeto:</label>
+            <input type="text" name="projeto" value="{{ filtros.projeto }}" class="form-control form-control-sm" style="width:130px;">
+        </div>
+        {% endif %}
 
-    {% if mostrar_pessoa %}
-        <label>Pessoa:</label>
-        <input type="text" name="pessoa" value="{{ filtros.pessoa }}">
-    {% endif %}
+        {% if mostrar_pessoa %}
+        <div class="d-flex align-items-center gap-1">
+            <label class="text-nowrap mb-0 small">Pessoa:</label>
+            <input type="text" name="pessoa" value="{{ filtros.pessoa }}" class="form-control form-control-sm" style="width:130px;">
+        </div>
+        {% endif %}
 
-    {% if mostrar_equipamento %}
-        <label>Equipamento:</label>
-        <input type="text" name="equipamento" value="{{ filtros.equipamento }}">
-    {% endif %}
+        {% if mostrar_equipamento %}
+        <div class="d-flex align-items-center gap-1">
+            <label class="text-nowrap mb-0 small">Equipamento:</label>
+            <input type="text" name="equipamento" value="{{ filtros.equipamento }}" class="form-control form-control-sm" style="width:130px;">
+        </div>
+        {% endif %}
 
-    {% if mostrar_email %}
-    <label>Email:</label>
-    <input type="text" name="email" value="{{ filtros.email }}">
-    {% endif %}
+        {% if mostrar_email %}
+        <div class="d-flex align-items-center gap-1">
+            <label class="text-nowrap mb-0 small">Email:</label>
+            <input type="text" name="email" value="{{ filtros.email }}" class="form-control form-control-sm" style="width:150px;">
+        </div>
+        {% endif %}
 
-    {% if mostrar_cpf %}
-    <label>Cpf:</label>
-    <input type="text" name="cpf" value="{{ filtros.cpf }}">
-    {% endif %}
+        {% if mostrar_cpf %}
+        <div class="d-flex align-items-center gap-1">
+            <label class="text-nowrap mb-0 small">CPF:</label>
+            <input type="text" name="cpf" value="{{ filtros.cpf }}" class="form-control form-control-sm" style="width:120px;">
+        </div>
+        {% endif %}
 
-    {% if mostrar_ano_fim %}
-        <label>Ano fim:</label>
-        <input type="number" name="ano_fim" value="{{ filtros.ano_fim }}" style="width: 80px;">
-    {% endif %}
+        {% if mostrar_ano_fim %}
+        <div class="d-flex align-items-center gap-1">
+            <label class="text-nowrap mb-0 small">Ano fim:</label>
+            <input type="number" name="ano_fim" value="{{ filtros.ano_fim }}" class="form-control form-control-sm" style="width:75px;">
+        </div>
+        {% endif %}
 
-    {% if mostrar_mes_fim %}
-        <label>Mês fim:</label>
-        <input type="number"  name="mes_fim" value="{{ filtros.mes_fim }}" style="width: 80px;">   
-    {% endif %}
+        {% if mostrar_mes_fim %}
+        <div class="d-flex align-items-center gap-1">
+            <label class="text-nowrap mb-0 small">Mês fim:</label>
+            <input type="number" name="mes_fim" value="{{ filtros.mes_fim }}" class="form-control form-control-sm" style="width:65px;">
+        </div>
+        {% endif %}
 
-    {% if mostrar_ano %}
-        <label>Ano:</label>
-        <input type="number" name="ano" value="{{ filtros.ano }}" style="width: 80px;">
-    {% endif %}
+        {% if mostrar_ano %}
+        <div class="d-flex align-items-center gap-1">
+            <label class="text-nowrap mb-0 small">Ano:</label>
+            <input type="number" name="ano" value="{{ filtros.ano }}" class="form-control form-control-sm" style="width:75px;">
+        </div>
+        {% endif %}
 
-    {% if mostrar_mes %}
-        <label>Mês:</label>
-        <input type="number" name="mes" value="{{ filtros.mes }}" style="width: 80px;">
-    {% endif %}
+        {% if mostrar_mes %}
+        <div class="d-flex align-items-center gap-1">
+            <label class="text-nowrap mb-0 small">Mês:</label>
+            <input type="number" name="mes" value="{{ filtros.mes }}" class="form-control form-control-sm" style="width:65px;">
+        </div>
+        {% endif %}
 
-
-
-
-    <button type="submit">Filtrar</button>
-    <a href="{{ request.path }}">Limpar Filtros</a>
+        <div class="d-flex gap-2 ms-auto">
+            <a href="{{ request.path }}" class="btn btn-sm btn-outline-secondary" style="width:120px;">
+                <i class="fas fa-times"></i> Limpar Filtros
+            </a>
+            <button type="submit" class="btn btn-sm btn-outline-primary" style="width:120px;">
+                <i class="fas fa-search"></i> Filtrar
+            </button>
+        </div>
+    </div>
 </form>

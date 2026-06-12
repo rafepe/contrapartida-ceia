@@ -8,15 +8,16 @@
 
 {% block titulo %}Projetos{% endblock %}
 {% block corpo %}
-<center>
-{% include "blocos/filtro_padrao.html" with mostrar_peia=True mostrar_projeto=True  mostrar_ano_fim=True mostrar_mes_fim=True %}
-</center>
+<div class="container-fluid mt-4">
+    <h2>Projetos</h2>
+    <hr>
+    <div class="mb-4">
+        {% include "blocos/filtro_padrao.html" with mostrar_peia=True mostrar_projeto=True mostrar_ano_fim=True mostrar_mes_fim=True %}
+    </div>
 
-<body>
     <div class="container">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <center>
-            <h1>Projetos</h1>
             {% render_table table %}
             <br>
             <a href="{% url 'projeto_create' %}">
@@ -25,5 +26,5 @@
             </center>
         </div>
     </div>
-</body>
+</div>
 {% endblock %}

@@ -8,18 +8,16 @@
 
 {% block titulo %}Salário{% endblock %}
 {% block corpo %}
+<div class="container-fluid mt-4">
+    <h2>Salário</h2>
+    <hr>
+    <div class="mb-4">
+        {% include "blocos/filtro_padrao.html" with mostrar_pessoa=True mostrar_ano=True mostrar_mes=True %}
+    </div>
 
-<center>
-    {% include "blocos/filtro_padrao.html" with mostrar_pessoa=True  mostrar_ano=True mostrar_mes=True %}
-</center>
-    
-
-
-<body>
     <div class="container">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <center>
-            <h1>Salário</h1>
             {% render_table table %}
             <br>
             <a href="{% url 'salario_create' %}">
@@ -28,5 +26,5 @@
             </center>
         </div>
     </div>
-</body>
+</div>
 {% endblock %}
