@@ -72,7 +72,7 @@
         {% endif %}
 
         <div class="d-flex gap-2 ms-auto">
-            <a href="{{ request.path }}" class="btn btn-sm btn-outline-secondary" style="width:120px;">
+            <a href="{{ request.path }}" class="btn btn-sm btn-outline-secondary btn-limpar-filtros" style="width:120px;">
                 <i class="fas fa-times"></i> Limpar Filtros
             </a>
             <button type="submit" class="btn btn-sm btn-outline-primary" style="width:120px;">
@@ -81,3 +81,34 @@
         </div>
     </div>
 </form>
+
+<script>
+(function () {
+    var KEY = 'filtros::' + window.location.pathname;
+
+    function semPage(queryString) {
+        var p = new URLSearchParams(queryString);
+        p.delete('page');
+        return p.toString();
+    }
+
+    var filtrosAtivos = semPage(window.location.search);
+
+    if (filtrosAtivos) {
+        localStorage.setItem(KEY, filtrosAtivos);
+    } else {
+        var salvo = localStorage.getItem(KEY);
+        if (salvo) {
+            window.location.replace(window.location.pathname + '?' + salvo);
+            return;
+        }
+    }
+
+    var btnLimpar = document.querySelector('.btn-limpar-filtros');
+    if (btnLimpar) {
+        btnLimpar.addEventListener('click', function () {
+            localStorage.removeItem(KEY);
+        });
+    }
+})();
+</script>
