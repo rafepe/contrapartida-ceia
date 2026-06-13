@@ -15,15 +15,16 @@
         {% include "blocos/filtro_padrao.html" with mostrar_peia=True mostrar_projeto=True mostrar_ano_fim=True mostrar_mes_fim=True %}
     </div>
 
-    <div class="container">
-        <div class="col-md-12 col-sm-12 col-xs-12">
-            <center>
+    <div class="container-fluid">
+        <div class="col-12">
+            <div style="font-size: 0.8rem;">
                 {% render_table table %}
-                <br>
+            </div>
+            <div class="text-center mt-2">
                 <a href="{% url 'contrapartida_so_criar_multiplos' %}">
                     <input type="button" class="btn btn-primary" value="Incluir multiplos">
                 </a>
-            </center>
+            </div>
         </div>
     </div>
 </div>

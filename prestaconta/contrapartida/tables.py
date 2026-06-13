@@ -226,22 +226,57 @@ class contrapartida_equipamento_table(tables.Table):
 class contrapartida_so_table(tables.Table):
     peia=tables.Column(empty_values=(),verbose_name="PEIA")
     nome = tables.LinkColumn("contrapartida_so_projeto", args=[A("detalhes")],verbose_name="Projeto")
-    valor_total = tables.Column(verbose_name="Valor Total")
-    valor_financiado = tables.Column(verbose_name="Valor Financiado")
+    valor_total = tables.Column(verbose_name="Total")
+    valor_financiado = tables.Column(verbose_name="Financiado")
     so_da_ue = tables.Column(verbose_name="SO da UE Permitido")
     so_no_ptr = tables.Column(verbose_name="SO no PTR")
-    cp_ue_so = tables.Column(verbose_name="Contrapartida UE de SO")
-    cp_mensal_so = tables.Column(verbose_name="Contrapartida Mensal de SO")
-    num_meses = tables.Column(verbose_name="Número de Meses")
-    data_inicio = tables.DateColumn(verbose_name="Data de Início", format="d/m/Y")
-    data_fim = tables.DateColumn(verbose_name="Data de Fim", format="d/m/Y")
+    cp_ue_so = tables.Column(verbose_name="Cp UE")
+    cp_mensal_so = tables.Column(verbose_name="Cp Mensal")
+    num_meses = tables.Column(verbose_name="Num  Meses")
+    data_inicio = tables.DateColumn(verbose_name="Data Início", format="d/m/Y")
+    data_fim = tables.DateColumn(verbose_name="Data Fim", format="d/m/Y")
     taxa_funape = tables.Column(verbose_name="Taxa Funape")
-    detalhes = tables.Column(empty_values=(), orderable=False, verbose_name="Por Projeto")
+    detalhes = tables.Column(empty_values=(), orderable=False, verbose_name="Ação")
     
+
+    def render_valor_total(self, value):
+        if value is None:
+            return '-'
+        return format_html('<span style="white-space:nowrap">{}</span>', locale.currency(value, grouping=True))
+
+    def render_valor_financiado(self, value):
+        if value is None:
+            return '-'
+        return format_html('<span style="white-space:nowrap">{}</span>', locale.currency(value, grouping=True))
+
+    def render_so_da_ue(self, value):
+        if value is None:
+            return '-'
+        return format_html('<span style="white-space:nowrap">{}</span>', locale.currency(value, grouping=True))
+
+    def render_so_no_ptr(self, value):
+        if value is None:
+            return '-'
+        return format_html('<span style="white-space:nowrap">{}</span>', locale.currency(value, grouping=True))
+
+    def render_cp_ue_so(self, value):
+        if value is None:
+            return '-'
+        return format_html('<span style="white-space:nowrap">{}</span>', locale.currency(value, grouping=True))
+
+    def render_cp_mensal_so(self, value):
+        if value is None:
+            return '-'
+        return format_html('<span style="white-space:nowrap">{}</span>', locale.currency(value, grouping=True))
+
+    def render_taxa_funape(self, value):
+        if value is None:
+            return '-'
+        return format_html('<span style="white-space:nowrap">{}</span>', locale.currency(value, grouping=True))
 
     def render_tai(self, record):
         return(record["peia"])
-    
+
     def render_detalhes(self, record):
             url = reverse("contrapartida_so_projeto", args=[record["detalhes"]])
             return format_html('<a href="{}" class="btn btn-sm btn-primary">Detalhar</a>', url)
